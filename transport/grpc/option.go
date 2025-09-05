@@ -1,12 +1,15 @@
 package grpc
 
 import (
+	"crypto/tls"
 	"net"
 	"net/url"
 	"time"
 
 	"google.golang.org/grpc"
 )
+
+// region ServerOption
 
 type ServerOption func(*Server)
 
@@ -70,3 +73,76 @@ func DisableReflection() ServerOption {
 		s.disableReflection = true
 	}
 }
+
+// endregion
+
+// region ClientOption
+
+type ClientOption func(*clientOptions)
+
+type clientOptions struct {
+	endpoint   string
+	subsetSize int
+	tlsConf    *tls.Config
+	timeout    time.Duration
+	// discovery  registry.Discovery
+	// middleware
+	// streamMiddleware
+	unaryClientInts  []grpc.UnaryClientInterceptor
+	streamClientInts []grpc.StreamClientInterceptor
+	grpcOpts         []grpc.DialOption
+	// balancerName
+	// filters
+	// healthCheckConfig
+	// printDiscoveryDebugLog
+}
+
+func WithEndpoint(endpoint string) ClientOption {
+	return func(o *clientOptions) {
+		o.endpoint = endpoint
+	}
+}
+
+func WithSubsetSize(size int) ClientOption {
+	return func(o *clientOptions) {
+		o.subsetSize = size
+	}
+}
+
+func WithTLSConfig(tlsConf *tls.Config) ClientOption {
+	return func(o *clientOptions) {
+		o.tlsConf = tlsConf
+	}
+}
+
+func WithTimeout(timeout time.Duration) ClientOption {
+	return func(o *clientOptions) {
+		o.timeout = timeout
+	}
+}
+
+// func WithDiscovery(discovery registry.Discovery) ClientOption {
+// 	return func(o *clientOptions) {
+// 		o.discovery = discovery
+// 	}
+// }
+
+func WithUnaryClientInterceptor(ints ...grpc.UnaryClientInterceptor) ClientOption {
+	return func(o *clientOptions) {
+		o.unaryClientInts = ints
+	}
+}
+
+func WithStreamClientInterceptor(ints ...grpc.StreamClientInterceptor) ClientOption {
+	return func(o *clientOptions) {
+		o.streamClientInts = ints
+	}
+}
+
+func WithOptions(opts ...grpc.DialOption) ClientOption {
+	return func(o *clientOptions) {
+		o.grpcOpts = opts
+	}
+}
+
+// endregion
