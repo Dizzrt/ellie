@@ -1,0 +1,22 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+x509_extensions = v3_ext
+
+[dn]
+C = CN
+ST = Test
+L = Test
+O = TestOrg
+OU = TestOU
+CN = test-client  # 客户端标识（可自定义）
+
+[v3_ext]
+subjectAltName = @alt_names
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth  # 客户端证书专用（区别于服务端的serverAuth）
+
+[alt_names]
+DNS.1 = test-client  # 客户端SAN，可与CN一致或自定义

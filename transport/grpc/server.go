@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/url"
@@ -12,6 +13,7 @@ import (
 	"github.com/Dizzrt/ellie/transport"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/admin"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -22,8 +24,8 @@ var (
 
 type Server struct {
 	*grpc.Server
-	baseCtx context.Context
-	// tlsConf
+	baseCtx  context.Context
+	tlsConf  *tls.Config
 	lis      net.Listener
 	err      error
 	network  string
@@ -75,7 +77,10 @@ func NewServer(opts ...ServerOption) *Server {
 		grpc.ChainStreamInterceptor(streamInts...),
 	}
 
-	// TODO tls support
+	if srv.tlsConf != nil {
+		temp := credentials.NewTLS(srv.tlsConf)
+		grpcOpts = append(grpcOpts, grpc.Creds(temp))
+	}
 
 	if len(srv.grpcOpts) > 0 {
 		grpcOpts = append(grpcOpts, srv.grpcOpts...)
@@ -113,7 +118,7 @@ func (s *Server) initializeListenerAndEndpoint() error {
 			return err
 		}
 
-		s.endpoint = endpoint.New(endpoint.Scheme("grpc", false /* TODO tls */), addr)
+		s.endpoint = endpoint.New(endpoint.Scheme("grpc", s.tlsConf != nil), addr)
 	}
 
 	return s.err

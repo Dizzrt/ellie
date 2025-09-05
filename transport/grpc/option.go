@@ -13,7 +13,11 @@ import (
 
 type ServerOption func(*Server)
 
-// TODO tls
+func TLSConfig(tlsConf *tls.Config) ServerOption {
+	return func(s *Server) {
+		s.tlsConf = tlsConf
+	}
+}
 
 func Listener(lis net.Listener) ServerOption {
 	return func(s *Server) {

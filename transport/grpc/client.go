@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -45,10 +46,11 @@ func dial(isInsecure bool, opts ...ClientOption) (*grpc.ClientConn, error) {
 
 	if isInsecure {
 		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	}
-
-	if options.tlsConf != nil {
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(options.tlsConf)))
+	} else if options.tlsConf != nil {
+		temp := credentials.NewTLS(options.tlsConf)
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(temp))
+	} else {
+		return nil, fmt.Errorf("tls config is nil")
 	}
 
 	if len(options.grpcOpts) > 0 {
