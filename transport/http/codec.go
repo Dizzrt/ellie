@@ -19,9 +19,9 @@ type Request = http.Request
 type Flusher = http.Flusher
 type ResponseWriter = http.ResponseWriter
 
-type RequestDecoder = func(*http.Request, any) error
-type ResponseEncoder = func(http.ResponseWriter, *http.Request, any) error
-type ErrorEncoder = func(http.ResponseWriter, *http.Request, error)
+type HTTPCodecRequestDecoder = func(*http.Request, any) error
+type HTTPCodecResponseEncoder = func(http.ResponseWriter, *http.Request, any) error
+type HTTPCodecErrorEncoder = func(http.ResponseWriter, *http.Request, error)
 
 func getCodecByHeaderName(r *http.Request, name string) (encoding.Codec, bool) {
 	for _, accept := range r.Header[name] {

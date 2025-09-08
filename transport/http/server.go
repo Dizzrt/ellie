@@ -24,22 +24,24 @@ var (
 
 type Server struct {
 	*http.Server
-	lis      net.Listener
+
+	err    error
+	lis    net.Listener
+	router *mux.Router
+
 	tlsConf  *tls.Config
 	endpoint *url.URL
-	err      error
 	network  string
 	address  string
 	timeout  time.Duration
 	// TODO filters
 	// TODO middleware
-	pathParamsDecoder  RequestDecoder
-	queryParamsDecoder RequestDecoder
-	requestBodyDecoder RequestDecoder
-	responseEncoder    ResponseEncoder
-	errorEncoder       ErrorEncoder
+	pathParamsDecoder  HTTPCodecRequestDecoder
+	queryParamsDecoder HTTPCodecRequestDecoder
+	requestBodyDecoder HTTPCodecRequestDecoder
+	responseEncoder    HTTPCodecResponseEncoder
+	errorEncoder       HTTPCodecErrorEncoder
 	strictSlash        bool
-	router             *mux.Router
 }
 
 func NewServer(opts ...ServerOption) *Server {
