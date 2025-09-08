@@ -124,7 +124,7 @@ func (s *Server) initializeListenerAndEndpoint() error {
 	return s.err
 }
 
-// region interface Server impl
+// region interfaces impl
 
 func (s *Server) Start(ctx context.Context) error {
 	if err := s.initializeListenerAndEndpoint(); err != nil {
@@ -164,10 +164,6 @@ func (s *Server) Stop(ctx context.Context) error {
 
 	return nil
 }
-
-// endregion
-
-// region interface Endpointer impl
 
 func (s *Server) Endpoint() (*url.URL, error) {
 	if err := s.initializeListenerAndEndpoint(); err != nil {
