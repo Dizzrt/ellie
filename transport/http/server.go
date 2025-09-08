@@ -31,18 +31,29 @@ type Server struct {
 	network  string
 	address  string
 	timeout  time.Duration
-	// filters
-	// middleware
-	strictSlash bool
-	router      *mux.Router
+	// TODO filters
+	// TODO middleware
+	pathParamsDecoder  RequestDecoder
+	queryParamsDecoder RequestDecoder
+	requestBodyDecoder RequestDecoder
+	responseEncoder    ResponseEncoder
+	errorEncoder       ErrorEncoder
+	strictSlash        bool
+	router             *mux.Router
 }
 
 func NewServer(opts ...ServerOption) *Server {
 	srv := &Server{
-		network: "tcp",
-		address: ":8081",
-		timeout: 1 * time.Second,
-		router:  mux.NewRouter(),
+		network:            "tcp",
+		address:            ":0",
+		timeout:            1 * time.Second,
+		pathParamsDecoder:  DefaultPathParamsDecoder,
+		queryParamsDecoder: DefaultQueryParamsDecoder,
+		requestBodyDecoder: DefaultRequestBodyDecoder,
+		responseEncoder:    DefaultResponseEncoder,
+		errorEncoder:       DefaultErrorEncoder,
+		strictSlash:        true,
+		router:             mux.NewRouter(),
 	}
 
 	srv.router.NotFoundHandler = http.DefaultServeMux
