@@ -34,7 +34,7 @@ type Server struct {
 	network  string
 	address  string
 	timeout  time.Duration
-	// TODO filters
+	filters  []FilterFunc
 	// TODO middleware
 	pathParamsDecoder  HTTPCodecRequestDecoder
 	queryParamsDecoder HTTPCodecRequestDecoder
@@ -67,7 +67,7 @@ func NewServer(opts ...ServerOption) *Server {
 	srv.router.StrictSlash(srv.strictSlash)
 	srv.Server = &http.Server{
 		TLSConfig: srv.tlsConf,
-		Handler:   srv.router,
+		Handler:   FilterChain(srv.filters...)(srv.router),
 	}
 
 	return srv
