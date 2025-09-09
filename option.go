@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Dizzrt/ellie/log"
 	"github.com/Dizzrt/ellie/registry"
 	"github.com/Dizzrt/ellie/transport"
 )
@@ -22,7 +23,7 @@ type options struct {
 	ctx  context.Context
 	sigs []os.Signal
 
-	// TODO logger
+	logger           log.LogWriter
 	registrar        registry.Registrar
 	registrarTimeout time.Duration
 	stopTimeout      time.Duration
@@ -77,7 +78,11 @@ func Signal(sigs ...os.Signal) Option {
 	}
 }
 
-// TODO logger
+func Logger(logger log.LogWriter) Option {
+	return func(opts *options) {
+		opts.logger = logger
+	}
+}
 
 func Registrar(r registry.Registrar) Option {
 	return func(opts *options) {

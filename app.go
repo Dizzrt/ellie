@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Dizzrt/ellie/log"
 	"github.com/Dizzrt/ellie/registry"
 	"github.com/Dizzrt/ellie/transport"
 	"github.com/google/uuid"
@@ -46,7 +47,9 @@ func New(opts ...Option) *App {
 		opt(&o)
 	}
 
-	// TODO logger
+	if o.logger != nil {
+		log.SetLogger(o.logger)
+	}
 
 	ctx, cancel := context.WithCancel(o.ctx)
 	return &App{

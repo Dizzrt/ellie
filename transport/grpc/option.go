@@ -49,7 +49,6 @@ func Timeout(timeout time.Duration) ServerOption {
 	}
 }
 
-// TODO logger
 // TODO middleware
 
 func UnaryInterceptor(ints ...grpc.UnaryServerInterceptor) ServerOption {

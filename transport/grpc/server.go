@@ -3,13 +3,13 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/url"
 	"time"
 
 	"github.com/Dizzrt/ellie/internal/endpoint"
 	"github.com/Dizzrt/ellie/internal/host"
+	"github.com/Dizzrt/ellie/log"
 	"github.com/Dizzrt/ellie/transport"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/admin"
@@ -60,7 +60,7 @@ func NewServer(opts ...ServerOption) *Server {
 	}
 
 	unaryInts := []grpc.UnaryServerInterceptor{
-		// TODO
+		// TODO unaryInts
 	}
 
 	if len(srv.unaryInts) > 0 {
@@ -68,7 +68,7 @@ func NewServer(opts ...ServerOption) *Server {
 	}
 
 	streamInts := []grpc.StreamServerInterceptor{
-		// TODO
+		// TODO streamInts
 	}
 
 	if len(srv.streamInts) > 0 {
@@ -138,8 +138,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 
 	s.baseCtx = ctx
-	// TODO log
-	fmt.Printf("[gRPC] server listening on %s\n", s.lis.Addr().String())
+	log.Infof("[gRPC] server listening on %s\n", s.lis.Addr().String())
 
 	if !s.customHealth {
 		s.health.Resume()
@@ -160,16 +159,14 @@ func (s *Server) Stop(ctx context.Context) error {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		// TODO log
-		fmt.Println("[gRPC] server stopping")
+		log.Info("[gRPC] server stopping")
 		s.GracefulStop()
 	}()
 
 	select {
 	case <-done:
 	case <-ctx.Done():
-		// TODO log
-		fmt.Println("[gRPC] server couldn't stop gracefully in time, forcing stop")
+		log.Warn("[gRPC] server couldn't stop gracefully in time, forcing stop")
 		s.Server.Stop()
 	}
 

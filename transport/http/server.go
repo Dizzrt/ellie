@@ -12,6 +12,7 @@ import (
 
 	"github.com/Dizzrt/ellie/internal/endpoint"
 	"github.com/Dizzrt/ellie/internal/host"
+	"github.com/Dizzrt/ellie/log"
 	"github.com/Dizzrt/ellie/transport"
 	"github.com/gorilla/mux"
 )
@@ -112,8 +113,7 @@ func (s *Server) Start(ctx context.Context) error {
 		return ctx
 	}
 
-	// TODO log
-	fmt.Printf("[HTTP] server listening on %s\n", s.lis.Addr().String())
+	log.Infof("[HTTP] server listening on %s\n", s.lis.Addr().String())
 
 	var err error
 	if s.tlsConf != nil {
@@ -130,13 +130,12 @@ func (s *Server) Start(ctx context.Context) error {
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	// TODO log
-	fmt.Println("[HTTP] server stopping")
+	log.Info("[HTTP] server stopping")
 
 	err := s.Shutdown(ctx)
 	if err != nil {
 		if ctx.Err() != nil {
-			// TODO log
+			log.Warn("[HTTP] server couldn't stop gracefully in time, forcing stop")
 			fmt.Println("[HTTP] server couldn't stop gracefully in time, forcing stop")
 			err = s.Close()
 		}
