@@ -70,7 +70,11 @@ func Options(opts ...grpc.ServerOption) ServerOption {
 	}
 }
 
-// TODO health
+func CustomHealth() ServerOption {
+	return func(s *Server) {
+		s.customHealth = true
+	}
+}
 
 func DisableReflection() ServerOption {
 	return func(s *Server) {

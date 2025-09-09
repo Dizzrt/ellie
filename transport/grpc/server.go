@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/admin"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -34,11 +36,11 @@ type Server struct {
 	timeout  time.Duration
 	// middleware
 	// streamMiddleware
-	unaryInts  []grpc.UnaryServerInterceptor
-	streamInts []grpc.StreamServerInterceptor
-	grpcOpts   []grpc.ServerOption
-	// health
-	// customHealth bool
+	unaryInts    []grpc.UnaryServerInterceptor
+	streamInts   []grpc.StreamServerInterceptor
+	grpcOpts     []grpc.ServerOption
+	health       *health.Server
+	customHealth bool
 	// metadata
 	cleanup           func()
 	disableReflection bool
@@ -50,6 +52,7 @@ func NewServer(opts ...ServerOption) *Server {
 		network: "tcp",
 		address: ":0",
 		timeout: 1 * time.Second,
+		health:  health.NewServer(),
 	}
 
 	for _, opt := range opts {
@@ -88,7 +91,10 @@ func NewServer(opts ...ServerOption) *Server {
 
 	srv.Server = grpc.NewServer(grpcOpts...)
 	// TODO metadata
-	// TODO health
+
+	if !srv.customHealth {
+		grpc_health_v1.RegisterHealthServer(srv.Server, srv.health)
+	}
 
 	if !srv.disableReflection {
 		reflection.Register(srv.Server)
@@ -135,7 +141,9 @@ func (s *Server) Start(ctx context.Context) error {
 	// TODO log
 	fmt.Printf("[gRPC] server listening on %s\n", s.lis.Addr().String())
 
-	// TODO health
+	if !s.customHealth {
+		s.health.Resume()
+	}
 
 	return s.Serve(s.lis)
 }
@@ -144,7 +152,10 @@ func (s *Server) Stop(ctx context.Context) error {
 	if s.cleanup != nil {
 		s.cleanup()
 	}
-	// TODO stop health
+
+	if !s.customHealth {
+		s.health.Shutdown()
+	}
 
 	done := make(chan struct{})
 	go func() {
