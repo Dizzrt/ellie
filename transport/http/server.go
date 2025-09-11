@@ -102,6 +102,22 @@ func (s *Server) initializeListenerAndEndpoint() error {
 	return s.err
 }
 
+// region codec
+
+func (s *Server) Bind(r *http.Request, v any) error {
+	return s.requestBodyDecoder(r, v)
+}
+
+func (s *Server) BindPathParams(r *http.Request, v any) error {
+	return s.pathParamsDecoder(r, v)
+}
+
+func (s *Server) BindQueryParams(r *http.Request, v any) error {
+	return s.queryParamsDecoder(r, v)
+}
+
+// endregion
+
 // region interfaces impl
 
 func (s *Server) Start(ctx context.Context) error {
