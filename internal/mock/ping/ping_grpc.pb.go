@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	PingService_Ping_FullMethodName       = "/ping.PingService/Ping"
 	PingService_PingStream_FullMethodName = "/ping.PingService/PingStream"
+	PingService_Hello_FullMethodName      = "/ping.PingService/Hello"
 )
 
 // PingServiceClient is the client API for PingService service.
@@ -29,6 +30,7 @@ const (
 type PingServiceClient interface {
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 	PingStream(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[PingRequest, PingResponse], error)
+	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
 }
 
 type pingServiceClient struct {
@@ -62,12 +64,23 @@ func (c *pingServiceClient) PingStream(ctx context.Context, opts ...grpc.CallOpt
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PingService_PingStreamClient = grpc.BidiStreamingClient[PingRequest, PingResponse]
 
+func (c *pingServiceClient) Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HelloResponse)
+	err := c.cc.Invoke(ctx, PingService_Hello_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PingServiceServer is the server API for PingService service.
 // All implementations must embed UnimplementedPingServiceServer
 // for forward compatibility.
 type PingServiceServer interface {
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	PingStream(grpc.BidiStreamingServer[PingRequest, PingResponse]) error
+	Hello(context.Context, *HelloRequest) (*HelloResponse, error)
 	mustEmbedUnimplementedPingServiceServer()
 }
 
@@ -83,6 +96,9 @@ func (UnimplementedPingServiceServer) Ping(context.Context, *PingRequest) (*Ping
 }
 func (UnimplementedPingServiceServer) PingStream(grpc.BidiStreamingServer[PingRequest, PingResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method PingStream not implemented")
+}
+func (UnimplementedPingServiceServer) Hello(context.Context, *HelloRequest) (*HelloResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
 }
 func (UnimplementedPingServiceServer) mustEmbedUnimplementedPingServiceServer() {}
 func (UnimplementedPingServiceServer) testEmbeddedByValue()                     {}
@@ -130,6 +146,24 @@ func _PingService_PingStream_Handler(srv interface{}, stream grpc.ServerStream) 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PingService_PingStreamServer = grpc.BidiStreamingServer[PingRequest, PingResponse]
 
+func _PingService_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HelloRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PingServiceServer).Hello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PingService_Hello_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PingServiceServer).Hello(ctx, req.(*HelloRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PingService_ServiceDesc is the grpc.ServiceDesc for PingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -140,6 +174,10 @@ var PingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _PingService_Ping_Handler,
+		},
+		{
+			MethodName: "Hello",
+			Handler:    _PingService_Hello_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

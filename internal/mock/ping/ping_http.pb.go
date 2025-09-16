@@ -11,25 +11,27 @@ import (
 
 type PingHTTPServer interface {
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
+	Hello(context.Context, *HelloRequest) (*HelloResponse, error)
 }
 
 func RegisterPingHTTPServer(s *http.Server, srv PingHTTPServer) {
 	r := gin.Default()
 	r.GET("/ping", _Ping_Ping_HTTP_Handler(s, srv))
+	r.POST("/hello/:name", _Ping_Hello_HTTP_handler(s, srv))
 
 	s.Handler = r
 }
 
-func _Ping_Ping_HTTP_Handler(s *http.Server, srv PingHTTPServer) gin.HandlerFunc {
+func _Ping_Ping_HTTP_Handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req PingRequest
-		if err := s.BindPathParams(ctx.Request, &req); err != nil {
+		if err := ctx.ShouldBindUri(&req); err != nil {
 			ctx.JSON(nhttp.StatusBadRequest, err.Error())
 			ctx.Abort()
 			return
 		}
 
-		if err := s.BindQueryParams(ctx.Request, &req); err != nil {
+		if err := ctx.ShouldBindQuery(&req); err != nil {
 			ctx.JSON(nhttp.StatusBadRequest, err.Error())
 			ctx.Abort()
 			return
@@ -38,6 +40,41 @@ func _Ping_Ping_HTTP_Handler(s *http.Server, srv PingHTTPServer) gin.HandlerFunc
 		res, err := srv.Ping(ctx.Request.Context(), &req)
 		if err != nil {
 			ctx.JSON(nhttp.StatusInternalServerError, err.Error())
+			ctx.Abort()
+			return
+		}
+
+		ctx.JSON(nhttp.StatusOK, res)
+	}
+}
+
+func _Ping_Hello_HTTP_handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req HelloRequest
+		if err := ctx.ShouldBindUri(&req); err != nil {
+			ctx.JSON(nhttp.StatusBadRequest, err.Error())
+			ctx.Abort()
+			return
+		}
+
+		if err := ctx.ShouldBindQuery(&req); err != nil {
+			ctx.JSON(nhttp.StatusBadRequest, err.Error())
+			ctx.Abort()
+			return
+		}
+
+		if ctx.Request.ContentLength > 0 {
+			if err := ctx.ShouldBind(&req); err != nil {
+				ctx.JSON(nhttp.StatusBadRequest, err.Error())
+				ctx.Abort()
+				return
+			}
+		}
+
+		res, err := srv.Hello(ctx.Request.Context(), &req)
+		if err != nil {
+			ctx.JSON(nhttp.StatusInternalServerError, err.Error())
+			ctx.Abort()
 			return
 		}
 

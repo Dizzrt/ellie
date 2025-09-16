@@ -102,6 +102,102 @@ func (x *PingResponse) GetMessage() string {
 	return ""
 }
 
+type HelloRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HelloRequest) Reset() {
+	*x = HelloRequest{}
+	mi := &file_ping_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HelloRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HelloRequest) ProtoMessage() {}
+
+func (x *HelloRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ping_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
+func (*HelloRequest) Descriptor() ([]byte, []int) {
+	return file_ping_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *HelloRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *HelloRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+type HelloResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HelloResponse) Reset() {
+	*x = HelloResponse{}
+	mi := &file_ping_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HelloResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HelloResponse) ProtoMessage() {}
+
+func (x *HelloResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ping_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HelloResponse.ProtoReflect.Descriptor instead.
+func (*HelloResponse) Descriptor() ([]byte, []int) {
+	return file_ping_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *HelloResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_ping_proto protoreflect.FileDescriptor
 
 const file_ping_proto_rawDesc = "" +
@@ -110,11 +206,17 @@ const file_ping_proto_rawDesc = "" +
 	"ping.proto\x12\x04ping\x1a\x1cgoogle/api/annotations.proto\"\r\n" +
 	"\vPingRequest\"(\n" +
 	"\fPingResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\x84\x01\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"6\n" +
+	"\fHelloRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\")\n" +
+	"\rHelloResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\xcd\x01\n" +
 	"\vPingService\x12<\n" +
 	"\x04Ping\x12\x11.ping.PingRequest\x1a\x12.ping.PingResponse\"\r\x82\xd3\xe4\x93\x02\a\x12\x05/ping\x127\n" +
 	"\n" +
-	"PingStream\x12\x11.ping.PingRequest\x1a\x12.ping.PingResponse(\x010\x01B,Z*github.com/Dizzrt/ellie/internal/mock/pingb\x06proto3"
+	"PingStream\x12\x11.ping.PingRequest\x1a\x12.ping.PingResponse(\x010\x01\x12G\n" +
+	"\x05Hello\x12\x12.ping.HelloRequest\x1a\x13.ping.HelloResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/hello/{name}B,Z*github.com/Dizzrt/ellie/internal/mock/pingb\x06proto3"
 
 var (
 	file_ping_proto_rawDescOnce sync.Once
@@ -128,18 +230,22 @@ func file_ping_proto_rawDescGZIP() []byte {
 	return file_ping_proto_rawDescData
 }
 
-var file_ping_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_ping_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_ping_proto_goTypes = []any{
-	(*PingRequest)(nil),  // 0: ping.PingRequest
-	(*PingResponse)(nil), // 1: ping.PingResponse
+	(*PingRequest)(nil),   // 0: ping.PingRequest
+	(*PingResponse)(nil),  // 1: ping.PingResponse
+	(*HelloRequest)(nil),  // 2: ping.HelloRequest
+	(*HelloResponse)(nil), // 3: ping.HelloResponse
 }
 var file_ping_proto_depIdxs = []int32{
 	0, // 0: ping.PingService.Ping:input_type -> ping.PingRequest
 	0, // 1: ping.PingService.PingStream:input_type -> ping.PingRequest
-	1, // 2: ping.PingService.Ping:output_type -> ping.PingResponse
-	1, // 3: ping.PingService.PingStream:output_type -> ping.PingResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	2, // 2: ping.PingService.Hello:input_type -> ping.HelloRequest
+	1, // 3: ping.PingService.Ping:output_type -> ping.PingResponse
+	1, // 4: ping.PingService.PingStream:output_type -> ping.PingResponse
+	3, // 5: ping.PingService.Hello:output_type -> ping.HelloResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -156,7 +262,7 @@ func file_ping_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ping_proto_rawDesc), len(file_ping_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

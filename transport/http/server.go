@@ -14,7 +14,7 @@ import (
 	"github.com/Dizzrt/ellie/internal/host"
 	"github.com/Dizzrt/ellie/log"
 	"github.com/Dizzrt/ellie/transport"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -26,9 +26,10 @@ var (
 type Server struct {
 	*http.Server
 
-	err    error
-	lis    net.Listener
-	router *mux.Router
+	err error
+	lis net.Listener
+	// router *mux.Router
+	engine *gin.Engine
 
 	tlsConf  *tls.Config
 	endpoint *url.URL
@@ -56,26 +57,27 @@ func NewServer(opts ...ServerOption) *Server {
 		responseEncoder:    DefaultResponseEncoder,
 		errorEncoder:       DefaultErrorEncoder,
 		strictSlash:        true,
-		router:             mux.NewRouter(),
+		engine:             gin.Default(),
 	}
 
-	srv.router.NotFoundHandler = http.DefaultServeMux
-	srv.router.MethodNotAllowedHandler = http.DefaultServeMux
+	// srv.router.NotFoundHandler = http.DefaultServeMux
+	// srv.router.MethodNotAllowedHandler = http.DefaultServeMux
 	for _, opt := range opts {
 		opt(srv)
 	}
 
-	srv.router.StrictSlash(srv.strictSlash)
+	// srv.router.StrictSlash(srv.strictSlash)
+	// srv.engine.RedirectTrailingSlash = true
 	srv.Server = &http.Server{
 		TLSConfig: srv.tlsConf,
-		Handler:   FilterChain(srv.filters...)(srv.router),
+		Handler:   FilterChain(srv.filters...)(srv.engine),
 	}
 
 	return srv
 }
 
 func (s *Server) HandlePrefix(prefix string, h http.Handler) {
-	s.router.PathPrefix(prefix).Handler(h)
+	// s.router.PathPrefix(prefix).Handler(h)
 }
 
 func (s *Server) initializeListenerAndEndpoint() error {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,6 +21,12 @@ type pingServer struct {
 func (s *pingServer) Ping(ctx context.Context, req *ping.PingRequest) (*ping.PingResponse, error) {
 	return &ping.PingResponse{
 		Message: "pong",
+	}, nil
+}
+
+func (s *pingServer) Hello(ctx context.Context, req *ping.HelloRequest) (*ping.HelloResponse, error) {
+	return &ping.HelloResponse{
+		Message: fmt.Sprintf("hello %s, type is %s", req.GetName(), req.GetType()),
 	}, nil
 }
 
@@ -44,8 +51,9 @@ func TestHTTPServer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	url := e.String() + "/ping"
-	resp, err := nhttp.Get(url)
+	url := e.String() + "/hello/ellie?type=mock"
+	resp, err := nhttp.Post(url, "application/json", strings.NewReader(``))
+	// resp, err := nhttp.Post(url, "application/json", strings.NewReader(`{"name": "ellieFromBody","type": "mockFromBody"}`))
 	if err != nil {
 		t.Fatal(err)
 	}

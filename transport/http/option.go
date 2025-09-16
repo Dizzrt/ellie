@@ -2,7 +2,6 @@ package http
 
 import (
 	"crypto/tls"
-	"net/http"
 	"net/url"
 	"time"
 )
@@ -76,22 +75,22 @@ func StrictSlash(isStrict bool) ServerOption {
 }
 
 // region wrap mux.router options
-func PathPrefix(prefix string) ServerOption {
-	return func(s *Server) {
-		s.router = s.router.PathPrefix(prefix).Subrouter()
-	}
-}
+// func PathPrefix(prefix string) ServerOption {
+// 	return func(s *Server) {
+// 		s.router = s.router.PathPrefix(prefix).Subrouter()
+// 	}
+// }
 
-func NotFoundHandler(h http.Handler) ServerOption {
-	return func(s *Server) {
-		s.router.NotFoundHandler = h
-	}
-}
+// func NotFoundHandler(h http.Handler) ServerOption {
+// 	return func(s *Server) {
+// 		s.router.NotFoundHandler = h
+// 	}
+// }
 
-func MethodNotAllowedHandler(h http.Handler) ServerOption {
-	return func(s *Server) {
-		s.router.MethodNotAllowedHandler = h
-	}
-}
+// func MethodNotAllowedHandler(h http.Handler) ServerOption {
+// 	return func(s *Server) {
+// 		s.router.MethodNotAllowedHandler = h
+// 	}
+// }
 
 // endregion
