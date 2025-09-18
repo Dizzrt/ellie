@@ -12,6 +12,8 @@ import (
 
 	"github.com/Dizzrt/ellie/internal/mock/ping"
 	"github.com/Dizzrt/ellie/transport/http"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type pingServer struct {
@@ -19,6 +21,7 @@ type pingServer struct {
 }
 
 func (s *pingServer) Ping(ctx context.Context, req *ping.PingRequest) (*ping.PingResponse, error) {
+	status.New(codes.Unknown, "unknown error")
 	return &ping.PingResponse{
 		Message: "pong",
 	}, nil
@@ -52,8 +55,8 @@ func TestHTTPServer(t *testing.T) {
 	}
 
 	url := e.String() + "/hello/ellie?type=mock"
-	resp, err := nhttp.Post(url, "application/json", strings.NewReader(``))
-	// resp, err := nhttp.Post(url, "application/json", strings.NewReader(`{"name": "ellieFromBody","type": "mockFromBody"}`))
+	// resp, err := nhttp.Post(url, "application/json", strings.NewReader(``))
+	resp, err := nhttp.Post(url, "application/json", strings.NewReader(`{"name": "ellieFromBody","type": "mockFromBody"}`))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"net/url"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ServerOption func(*Server)
@@ -38,48 +40,53 @@ func Timeout(timeout time.Duration) ServerOption {
 	}
 }
 
-func PathParamsDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
-	return func(s *Server) {
-		s.pathParamsDecoder = decoder
-	}
-}
-
-func QueryParamsDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
-	return func(s *Server) {
-		s.queryParamsDecoder = decoder
-	}
-}
-
-func RequestBodyDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
-	return func(s *Server) {
-		s.requestBodyDecoder = decoder
-	}
-}
-
-func ResponseEncoder(encoder HTTPCodecResponseEncoder) ServerOption {
-	return func(s *Server) {
-		s.responseEncoder = encoder
-	}
-}
-
-func ErrorEncoder(encoder HTTPCodecErrorEncoder) ServerOption {
-	return func(s *Server) {
-		s.errorEncoder = encoder
-	}
-}
-
-func StrictSlash(isStrict bool) ServerOption {
-	return func(s *Server) {
-		s.strictSlash = isStrict
-	}
-}
-
-// region wrap mux.router options
-// func PathPrefix(prefix string) ServerOption {
+// func PathParamsDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
 // 	return func(s *Server) {
-// 		s.router = s.router.PathPrefix(prefix).Subrouter()
+// 		s.pathParamsDecoder = decoder
 // 	}
 // }
+
+// func QueryParamsDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
+// 	return func(s *Server) {
+// 		s.queryParamsDecoder = decoder
+// 	}
+// }
+
+// func RequestBodyDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
+// 	return func(s *Server) {
+// 		s.requestBodyDecoder = decoder
+// 	}
+// }
+
+// func ResponseEncoder(encoder HTTPCodecResponseEncoder) ServerOption {
+// 	return func(s *Server) {
+// 		s.responseEncoder = encoder
+// 	}
+// }
+
+// func ErrorEncoder(encoder HTTPCodecErrorEncoder) ServerOption {
+// 	return func(s *Server) {
+// 		s.errorEncoder = encoder
+// 	}
+// }
+
+func RedirectTrailingSlash(isStrict bool) ServerOption {
+	return func(s *Server) {
+		s.redirectTrailingSlash = isStrict
+	}
+}
+
+func NoRouteHandlers(handler gin.HandlerFunc) ServerOption {
+	return func(s *Server) {
+		s.noRouteHandlers = append(s.noRouteHandlers, handler)
+	}
+}
+
+func NoMethodHandlers(handler gin.HandlerFunc) ServerOption {
+	return func(s *Server) {
+		s.NoMethodHandler = append(s.NoMethodHandler, handler)
+	}
+}
 
 // func NotFoundHandler(h http.Handler) ServerOption {
 // 	return func(s *Server) {
@@ -92,5 +99,3 @@ func StrictSlash(isStrict bool) ServerOption {
 // 		s.router.MethodNotAllowedHandler = h
 // 	}
 // }
-
-// endregion

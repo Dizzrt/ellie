@@ -28,8 +28,11 @@ type Server struct {
 
 	err error
 	lis net.Listener
-	// router *mux.Router
-	engine *gin.Engine
+
+	engine                *gin.Engine
+	noRouteHandlers       []gin.HandlerFunc
+	NoMethodHandler       []gin.HandlerFunc
+	redirectTrailingSlash bool
 
 	tlsConf  *tls.Config
 	endpoint *url.URL
@@ -38,36 +41,40 @@ type Server struct {
 	timeout  time.Duration
 	filters  []FilterFunc
 	// TODO middleware
-	pathParamsDecoder  HTTPCodecRequestDecoder
-	queryParamsDecoder HTTPCodecRequestDecoder
-	requestBodyDecoder HTTPCodecRequestDecoder
-	responseEncoder    HTTPCodecResponseEncoder
-	errorEncoder       HTTPCodecErrorEncoder
-	strictSlash        bool
+	// pathParamsDecoder  HTTPCodecRequestDecoder
+	// queryParamsDecoder HTTPCodecRequestDecoder
+	// requestBodyDecoder HTTPCodecRequestDecoder
+	// responseEncoder    HTTPCodecResponseEncoder
+	// errorEncoder       HTTPCodecErrorEncoder
 }
 
 func NewServer(opts ...ServerOption) *Server {
 	srv := &Server{
-		network:            "tcp",
-		address:            ":0",
-		timeout:            1 * time.Second,
-		pathParamsDecoder:  DefaultPathParamsDecoder,
-		queryParamsDecoder: DefaultQueryParamsDecoder,
-		requestBodyDecoder: DefaultRequestBodyDecoder,
-		responseEncoder:    DefaultResponseEncoder,
-		errorEncoder:       DefaultErrorEncoder,
-		strictSlash:        true,
-		engine:             gin.Default(),
+		network: "tcp",
+		address: ":0",
+		timeout: 1 * time.Second,
+		// pathParamsDecoder:     DefaultPathParamsDecoder,
+		// queryParamsDecoder:    DefaultQueryParamsDecoder,
+		// requestBodyDecoder:    DefaultRequestBodyDecoder,
+		// responseEncoder:       DefaultResponseEncoder,
+		// errorEncoder:          DefaultErrorEncoder,
+		engine:                gin.Default(),
+		redirectTrailingSlash: true,
 	}
 
-	// srv.router.NotFoundHandler = http.DefaultServeMux
-	// srv.router.MethodNotAllowedHandler = http.DefaultServeMux
+	if len(srv.noRouteHandlers) > 0 {
+		srv.engine.NoRoute(srv.noRouteHandlers...)
+	}
+
+	if len(srv.NoMethodHandler) > 0 {
+		srv.engine.NoMethod(srv.NoMethodHandler...)
+	}
+
 	for _, opt := range opts {
 		opt(srv)
 	}
 
-	// srv.router.StrictSlash(srv.strictSlash)
-	// srv.engine.RedirectTrailingSlash = true
+	srv.engine.RedirectTrailingSlash = srv.redirectTrailingSlash
 	srv.Server = &http.Server{
 		TLSConfig: srv.tlsConf,
 		Handler:   FilterChain(srv.filters...)(srv.engine),
@@ -76,8 +83,8 @@ func NewServer(opts ...ServerOption) *Server {
 	return srv
 }
 
-func (s *Server) HandlePrefix(prefix string, h http.Handler) {
-	// s.router.PathPrefix(prefix).Handler(h)
+func (s *Server) Engine() *gin.Engine {
+	return s.engine
 }
 
 func (s *Server) initializeListenerAndEndpoint() error {
@@ -106,17 +113,17 @@ func (s *Server) initializeListenerAndEndpoint() error {
 
 // region codec
 
-func (s *Server) Bind(r *http.Request, v any) error {
-	return s.requestBodyDecoder(r, v)
-}
+// func (s *Server) Bind(r *http.Request, v any) error {
+// 	return s.requestBodyDecoder(r, v)
+// }
 
-func (s *Server) BindPathParams(r *http.Request, v any) error {
-	return s.pathParamsDecoder(r, v)
-}
+// func (s *Server) BindPathParams(r *http.Request, v any) error {
+// 	return s.pathParamsDecoder(r, v)
+// }
 
-func (s *Server) BindQueryParams(r *http.Request, v any) error {
-	return s.queryParamsDecoder(r, v)
-}
+// func (s *Server) BindQueryParams(r *http.Request, v any) error {
+// 	return s.queryParamsDecoder(r, v)
+// }
 
 // endregion
 

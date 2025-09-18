@@ -15,7 +15,8 @@ type PingHTTPServer interface {
 }
 
 func RegisterPingHTTPServer(s *http.Server, srv PingHTTPServer) {
-	r := gin.Default()
+	r := s.Engine()
+
 	r.GET("/ping", _Ping_Ping_HTTP_Handler(s, srv))
 	r.POST("/hello/:name", _Ping_Hello_HTTP_handler(s, srv))
 
