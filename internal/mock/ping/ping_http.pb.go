@@ -3,8 +3,6 @@ package ping
 import (
 	context "context"
 
-	nhttp "net/http"
-
 	"github.com/Dizzrt/ellie/transport/http"
 	"github.com/gin-gonic/gin"
 )
@@ -27,25 +25,25 @@ func _Ping_Ping_HTTP_Handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFunc
 	return func(ctx *gin.Context) {
 		var req PingRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
-			ctx.JSON(nhttp.StatusBadRequest, err.Error())
+			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		if err := ctx.ShouldBindQuery(&req); err != nil {
-			ctx.JSON(nhttp.StatusBadRequest, err.Error())
+			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		res, err := srv.Ping(ctx.Request.Context(), &req)
 		if err != nil {
-			ctx.JSON(nhttp.StatusInternalServerError, err.Error())
+			ctx.JSON(http.HTTPStatusCodeFromError(err), http.WrapHTTPResponse(res, err))
 			ctx.Abort()
 			return
 		}
 
-		ctx.JSON(nhttp.StatusOK, res)
+		ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
 	}
 }
 
@@ -53,20 +51,20 @@ func _Ping_Hello_HTTP_handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFun
 	return func(ctx *gin.Context) {
 		var req HelloRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
-			ctx.JSON(nhttp.StatusBadRequest, err.Error())
+			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		if err := ctx.ShouldBindQuery(&req); err != nil {
-			ctx.JSON(nhttp.StatusBadRequest, err.Error())
+			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		if ctx.Request.ContentLength > 0 {
 			if err := ctx.ShouldBind(&req); err != nil {
-				ctx.JSON(nhttp.StatusBadRequest, err.Error())
+				ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
 				ctx.Abort()
 				return
 			}
@@ -74,11 +72,11 @@ func _Ping_Hello_HTTP_handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFun
 
 		res, err := srv.Hello(ctx.Request.Context(), &req)
 		if err != nil {
-			ctx.JSON(nhttp.StatusInternalServerError, err.Error())
+			ctx.JSON(http.HTTPStatusCodeFromError(err), http.WrapHTTPResponse(res, err))
 			ctx.Abort()
 			return
 		}
 
-		ctx.JSON(nhttp.StatusOK, res)
+		ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
 	}
 }
