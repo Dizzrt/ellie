@@ -8,6 +8,7 @@ import (
 
 	"github.com/Dizzrt/ellie/encoding"
 	"github.com/Dizzrt/ellie/errors"
+	"github.com/gin-gonic/gin/render"
 	"github.com/gorilla/mux"
 )
 
@@ -20,7 +21,10 @@ type Flusher = http.Flusher
 type ResponseWriter = http.ResponseWriter
 
 type HTTPCodecRequestDecoder = func(*http.Request, any) error
-type HTTPCodecResponseEncoder = func(http.ResponseWriter, *http.Request, any) error
+
+// type HTTPCodecResponseEncoder = func(http.ResponseWriter, *http.Request, any) error
+type HTTPResponseEncoder = func(any, error) (int, render.Render)
+
 type HTTPCodecErrorEncoder = func(http.ResponseWriter, *http.Request, error)
 
 func getCodecByHeaderName(r *http.Request, name string) (encoding.Codec, bool) {
@@ -74,31 +78,11 @@ func DefaultRequestBodyDecoder(r *http.Request, v any) error {
 	return nil
 }
 
-func DefaultResponseEncoder(w http.ResponseWriter, r *http.Request, v any) error {
-	if v == nil {
-		return nil
-	}
+func DefaultResponseEncoder(data any, err error) (int, render.Render) {
+	code := HTTPStatusCodeFromError(err)
+	r := render.JSON{Data: WrapHTTPResponse(data, err)}
 
-	if rd, ok := v.(Redirector); ok {
-		url, code := rd.Redirect()
-		http.Redirect(w, r, url, code)
-		return nil
-	}
-
-	codec, _ := getCodecByHeaderName(r, "Accept")
-	data, err := codec.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	w.Header().Set("Content-Type", contentType(codec.Name()))
-
-	_, err = w.Write(data)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return code, r
 }
 
 func DefaultErrorEncoder(w http.ResponseWriter, r *http.Request, err error) {

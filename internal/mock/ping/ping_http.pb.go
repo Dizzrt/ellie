@@ -21,7 +21,7 @@ func RegisterPingHTTPServer(s *http.Server, srv PingHTTPServer) {
 	s.Handler = r
 }
 
-func _Ping_Ping_HTTP_Handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFunc {
+func _Ping_Ping_HTTP_Handler(hs *http.Server, srv PingHTTPServer) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req PingRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
@@ -43,11 +43,12 @@ func _Ping_Ping_HTTP_Handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFunc
 			return
 		}
 
-		ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
+		// ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
+		hs.EncodeResponse(ctx, res, err)
 	}
 }
 
-func _Ping_Hello_HTTP_handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFunc {
+func _Ping_Hello_HTTP_handler(hs *http.Server, srv PingHTTPServer) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req HelloRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
@@ -77,6 +78,7 @@ func _Ping_Hello_HTTP_handler(_ *http.Server, srv PingHTTPServer) gin.HandlerFun
 			return
 		}
 
-		ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
+		// ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
+		hs.EncodeResponse(ctx, res, err)
 	}
 }

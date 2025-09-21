@@ -44,7 +44,7 @@ type Server struct {
 	// pathParamsDecoder  HTTPCodecRequestDecoder
 	// queryParamsDecoder HTTPCodecRequestDecoder
 	// requestBodyDecoder HTTPCodecRequestDecoder
-	// responseEncoder    HTTPCodecResponseEncoder
+	responseEncoder HTTPResponseEncoder
 	// errorEncoder       HTTPCodecErrorEncoder
 }
 
@@ -56,7 +56,7 @@ func NewServer(opts ...ServerOption) *Server {
 		// pathParamsDecoder:     DefaultPathParamsDecoder,
 		// queryParamsDecoder:    DefaultQueryParamsDecoder,
 		// requestBodyDecoder:    DefaultRequestBodyDecoder,
-		// responseEncoder:       DefaultResponseEncoder,
+		responseEncoder: DefaultResponseEncoder,
 		// errorEncoder:          DefaultErrorEncoder,
 		engine:                gin.Default(),
 		redirectTrailingSlash: true,
@@ -124,6 +124,11 @@ func (s *Server) initializeListenerAndEndpoint() error {
 // func (s *Server) BindQueryParams(r *http.Request, v any) error {
 // 	return s.queryParamsDecoder(r, v)
 // }
+
+func (s *Server) EncodeResponse(ctx *gin.Context, data any, err error) {
+	code, r := s.responseEncoder(data, err)
+	ctx.Render(code, r)
+}
 
 // endregion
 
