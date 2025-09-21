@@ -25,25 +25,24 @@ func _Ping_Ping_HTTP_Handler(hs *http.Server, srv PingHTTPServer) gin.HandlerFun
 	return func(ctx *gin.Context) {
 		var req PingRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
+			ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		if err := ctx.ShouldBindQuery(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
+			ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		res, err := srv.Ping(ctx.Request.Context(), &req)
 		if err != nil {
-			ctx.JSON(http.HTTPStatusCodeFromError(err), http.WrapHTTPResponse(res, err))
+			ctx.JSON(http.HTTPStatusCodeFromError(err), hs.WrapHTTPResponse(res, err))
 			ctx.Abort()
 			return
 		}
 
-		// ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
 		hs.EncodeResponse(ctx, res, err)
 	}
 }
@@ -52,20 +51,20 @@ func _Ping_Hello_HTTP_handler(hs *http.Server, srv PingHTTPServer) gin.HandlerFu
 	return func(ctx *gin.Context) {
 		var req HelloRequest
 		if err := ctx.ShouldBindUri(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
+			ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		if err := ctx.ShouldBindQuery(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
+			ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
 
 		if ctx.Request.ContentLength > 0 {
 			if err := ctx.ShouldBind(&req); err != nil {
-				ctx.JSON(http.StatusBadRequest, http.WrapHTTPResponse(nil, err))
+				ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
 				ctx.Abort()
 				return
 			}
@@ -73,12 +72,11 @@ func _Ping_Hello_HTTP_handler(hs *http.Server, srv PingHTTPServer) gin.HandlerFu
 
 		res, err := srv.Hello(ctx.Request.Context(), &req)
 		if err != nil {
-			ctx.JSON(http.HTTPStatusCodeFromError(err), http.WrapHTTPResponse(res, err))
+			ctx.JSON(http.HTTPStatusCodeFromError(err), hs.WrapHTTPResponse(res, err))
 			ctx.Abort()
 			return
 		}
 
-		// ctx.JSON(http.StatusOK, http.WrapHTTPResponse(res, err))
 		hs.EncodeResponse(ctx, res, err)
 	}
 }

@@ -3,18 +3,19 @@ package http
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/Dizzrt/ellie/errors"
 	"github.com/Dizzrt/ellie/internal/endpoint"
 	"github.com/Dizzrt/ellie/internal/host"
 	"github.com/Dizzrt/ellie/log"
 	"github.com/Dizzrt/ellie/transport"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -41,23 +42,20 @@ type Server struct {
 	timeout  time.Duration
 	filters  []FilterFunc
 	// TODO middleware
-	// pathParamsDecoder  HTTPCodecRequestDecoder
-	// queryParamsDecoder HTTPCodecRequestDecoder
-	// requestBodyDecoder HTTPCodecRequestDecoder
-	responseEncoder HTTPResponseEncoder
-	// errorEncoder       HTTPCodecErrorEncoder
+
+	defaultSuccessCode    int
+	defaultSuccessMessage string
+	responseEncoder       HTTPResponseEncoder
 }
 
 func NewServer(opts ...ServerOption) *Server {
 	srv := &Server{
-		network: "tcp",
-		address: ":0",
-		timeout: 1 * time.Second,
-		// pathParamsDecoder:     DefaultPathParamsDecoder,
-		// queryParamsDecoder:    DefaultQueryParamsDecoder,
-		// requestBodyDecoder:    DefaultRequestBodyDecoder,
-		responseEncoder: DefaultResponseEncoder,
-		// errorEncoder:          DefaultErrorEncoder,
+		network:               "tcp",
+		address:               ":0",
+		timeout:               1 * time.Second,
+		defaultSuccessCode:    0,
+		defaultSuccessMessage: "ok",
+		responseEncoder:       DefaultResponseEncoder,
 		engine:                gin.Default(),
 		redirectTrailingSlash: true,
 	}
@@ -111,26 +109,37 @@ func (s *Server) initializeListenerAndEndpoint() error {
 	return s.err
 }
 
-// region codec
+func (s *Server) WrapHTTPResponse(data any, err error) gin.H {
+	code := s.defaultSuccessCode
+	message := s.defaultSuccessMessage
 
-// func (s *Server) Bind(r *http.Request, v any) error {
-// 	return s.requestBodyDecoder(r, v)
-// }
+	if err != nil {
+		if ee, ok := err.(*errors.Error); ok {
+			// ellie error
+			code = int(ee.Code)
+			message = ee.Message
+		} else if st, ok := status.FromError(err); ok {
+			// grpc error
+			code = int(st.Code())
+			message = st.Message()
+		} else {
+			// unknown error type
+			code = -1
+			message = err.Error()
+		}
+	}
 
-// func (s *Server) BindPathParams(r *http.Request, v any) error {
-// 	return s.pathParamsDecoder(r, v)
-// }
-
-// func (s *Server) BindQueryParams(r *http.Request, v any) error {
-// 	return s.queryParamsDecoder(r, v)
-// }
-
-func (s *Server) EncodeResponse(ctx *gin.Context, data any, err error) {
-	code, r := s.responseEncoder(data, err)
-	ctx.Render(code, r)
+	return gin.H{
+		"data":    data,
+		"status":  code,
+		"message": message,
+	}
 }
 
-// endregion
+func (s *Server) EncodeResponse(ctx *gin.Context, data any, err error) {
+	code, r := s.responseEncoder(data, err, s)
+	ctx.Render(code, r)
+}
 
 // region interfaces impl
 

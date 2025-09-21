@@ -6,7 +6,6 @@ require (
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/mux v1.8.1
 	github.com/spf13/cobra v1.10.1
 	golang.org/x/sync v0.16.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c

@@ -40,35 +40,23 @@ func Timeout(timeout time.Duration) ServerOption {
 	}
 }
 
-// func PathParamsDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
-// 	return func(s *Server) {
-// 		s.pathParamsDecoder = decoder
-// 	}
-// }
+func DefaultSuccessCode(code int) ServerOption {
+	return func(s *Server) {
+		s.defaultSuccessCode = code
+	}
+}
 
-// func QueryParamsDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
-// 	return func(s *Server) {
-// 		s.queryParamsDecoder = decoder
-// 	}
-// }
+func DefaultSuccessMessage(message string) ServerOption {
+	return func(s *Server) {
+		s.defaultSuccessMessage = message
+	}
+}
 
-// func RequestBodyDecoder(decoder HTTPCodecRequestDecoder) ServerOption {
-// 	return func(s *Server) {
-// 		s.requestBodyDecoder = decoder
-// 	}
-// }
-
-// func ResponseEncoder(encoder HTTPCodecResponseEncoder) ServerOption {
-// 	return func(s *Server) {
-// 		s.responseEncoder = encoder
-// 	}
-// }
-
-// func ErrorEncoder(encoder HTTPCodecErrorEncoder) ServerOption {
-// 	return func(s *Server) {
-// 		s.errorEncoder = encoder
-// 	}
-// }
+func ResponseEncoder(encoder HTTPResponseEncoder) ServerOption {
+	return func(s *Server) {
+		s.responseEncoder = encoder
+	}
+}
 
 func RedirectTrailingSlash(isStrict bool) ServerOption {
 	return func(s *Server) {
@@ -87,15 +75,3 @@ func NoMethodHandlers(handler gin.HandlerFunc) ServerOption {
 		s.NoMethodHandler = append(s.NoMethodHandler, handler)
 	}
 }
-
-// func NotFoundHandler(h http.Handler) ServerOption {
-// 	return func(s *Server) {
-// 		s.router.NotFoundHandler = h
-// 	}
-// }
-
-// func MethodNotAllowedHandler(h http.Handler) ServerOption {
-// 	return func(s *Server) {
-// 		s.router.MethodNotAllowedHandler = h
-// 	}
-// }

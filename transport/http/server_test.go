@@ -12,6 +12,8 @@ import (
 
 	"github.com/Dizzrt/ellie/internal/mock/ping"
 	"github.com/Dizzrt/ellie/transport/http"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/render"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,7 +38,19 @@ func (s *pingServer) Hello(ctx context.Context, req *ping.HelloRequest) (*ping.H
 func TestHTTPServer(t *testing.T) {
 	ctx := context.Background()
 
-	var opts = []http.ServerOption{}
+	var opts = []http.ServerOption{
+		http.DefaultSuccessCode(10000),
+		http.DefaultSuccessMessage("success"),
+		http.ResponseEncoder(func(data any, err error, s *http.Server) (int, render.Render) {
+			code := http.HTTPStatusCodeFromError(err)
+			r := render.JSON{Data: gin.H{
+				"data": data,
+				"err":  err,
+				"ext":  "custom response encoder",
+			}}
+			return code, r
+		}),
+	}
 	srv := http.NewServer(opts...)
 
 	ping.RegisterPingHTTPServer(srv, &pingServer{})
