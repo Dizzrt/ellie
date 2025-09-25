@@ -1,0 +1,13 @@
+[clusters]
+
+[clusters.a]
+ip = "10.0.0.1"
+port = 8000
+
+[clusters.b]
+ip = "10.0.0.2"
+port = 8005
+
+[clusters.c]
+ip = "10.0.0.3"
+port = 8000
