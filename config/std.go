@@ -95,6 +95,22 @@ func (c *stdViperConfig) Load() error {
 	return nil
 }
 
+func (c *stdViperConfig) Get(key string) Value {
+	return &stdValue{val: c.v.Get(key)}
+}
+
+func (c *stdViperConfig) IsSet(key string) bool {
+	return c.v.IsSet(key)
+}
+
+func (c *stdViperConfig) Unmarshal(obj any) error {
+	return c.v.Unmarshal(obj)
+}
+
+func (c *stdViperConfig) UnmarshalKey(key string, obj any) error {
+	return c.v.UnmarshalKey(key, obj)
+}
+
 func (c *stdViperConfig) GetConfigPath(env string) (string, error) {
 	if env != "" && !slices.Contains(c.validEnvs, env) {
 		// TODO std error
@@ -108,14 +124,6 @@ func (c *stdViperConfig) GetConfigPath(env string) (string, error) {
 
 	conf := fmt.Sprintf("%s/%s%s%s%s", c.configFileDir, c.configFileName, envSeparator, env, c.configFileSuffix)
 	return conf, nil
-}
-
-func (c *stdViperConfig) IsSet(key string) bool {
-	return c.v.IsSet(key)
-}
-
-func (c *stdViperConfig) Get(key string) Value {
-	return &stdValue{val: c.v.Get(key)}
 }
 
 func (c *stdViperConfig) mergeInConfig(conf string, env string) error {

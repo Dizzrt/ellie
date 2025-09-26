@@ -2,7 +2,9 @@ package config
 
 type Config interface {
 	Load() error
-	GetConfigPath(env string) (string, error)
-	IsSet(key string) bool
 	Get(key string) Value
+	IsSet(key string) bool
+	Unmarshal(obj any) error
+	UnmarshalKey(key string, obj any) error
+	GetConfigPath(env string) (string, error)
 }
