@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-const release = "v0.0.1-dev"
+const release = "v1.0.0"
 
 var (
 	showVersion     = flag.Bool("version", false, "print the version and exit")
@@ -32,9 +32,9 @@ func main() {
 				continue
 			}
 
-			// TODO
-			// generateFile(gen, f, *omitempty, *omitemptyPrefix)
+			generateFile(gen, f, *omitempty, *omitemptyPrefix)
 		}
+
 		return nil
 	})
 }

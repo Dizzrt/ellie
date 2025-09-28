@@ -53,7 +53,7 @@ func TestHTTPServer(t *testing.T) {
 	}
 	srv := http.NewServer(opts...)
 
-	ping.RegisterPingHTTPServer(srv, &pingServer{})
+	ping.RegisterPingServiceHTTPServer(srv, &pingServer{})
 	go func() {
 		if err := srv.Start(ctx); err != nil {
 			panic(err)

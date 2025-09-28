@@ -17,7 +17,8 @@ service PingService {
  
   rpc Hello(HelloRequest) returns (HelloResponse) {
     option (google.api.http) = {
-      get: "/hello/{name}"
+      post: "/hello/{name}",
+      body: "*",
     };
   }
 }

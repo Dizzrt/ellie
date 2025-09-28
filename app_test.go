@@ -25,14 +25,14 @@ func TestApp(t *testing.T) {
 	hsrv := http.NewServer()
 
 	ping.RegisterPingServiceServer(gsrv, &pingServer{})
-	ping.RegisterPingHTTPServer(hsrv, &pingServer{})
+	ping.RegisterPingServiceHTTPServer(hsrv, &pingServer{})
 
 	opts := []Option{
 		Server(gsrv, hsrv),
 	}
 
 	app := New(opts...)
-	time.AfterFunc(15*time.Second, func() {
+	time.AfterFunc(30*time.Second, func() {
 		app.Stop()
 	})
 
