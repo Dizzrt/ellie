@@ -26,28 +26,11 @@ func Register{{.ServiceType}}HTTPServer(hs *http.Server, srv {{.ServiceType}}HTT
 func _{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler(hs *http.Server, srv {{$svrType}}HTTPServer) gin.HandlerFunc {
     return func(ctx *gin.Context) {
         var req {{.Request}}
-        if err := ctx.ShouldBindUri(&req); err != nil {
-            ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
-			ctx.Abort()
-			return
-        }
-
-        if err := ctx.ShouldBindQuery(&req); err != nil {
+        if err := ginx.DecodeRequest(ctx, &req); err != nil {
 			ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
 			ctx.Abort()
 			return
 		}
-
-        {{- if .HasBody}}
-
-        if ctx.Request.ContentLength > 0 {
-			if err := ctx.ShouldBind(&req); err != nil {
-				ctx.JSON(http.StatusBadRequest, hs.WrapHTTPResponse(nil, err))
-				ctx.Abort()
-				return
-			}
-		}
-        {{- end}}
 
         res, err := srv.{{.Name}}(ctx.Request.Context(), &req)
 		if err != nil {

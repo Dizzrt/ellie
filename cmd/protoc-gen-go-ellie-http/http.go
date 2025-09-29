@@ -18,6 +18,7 @@ const (
 	contextPackage       = protogen.GoImportPath("context")
 	ginPackage           = protogen.GoImportPath("github.com/gin-gonic/gin")
 	transportHTTPPackage = protogen.GoImportPath("github.com/Dizzrt/ellie/transport/http")
+	ginxPackage          = protogen.GoImportPath("github.com/Dizzrt/ellie/transport/http/ginx")
 
 	deprecationComment = "// Deprecated: Do not use."
 )
@@ -53,11 +54,9 @@ func generateContent(gen *protogen.Plugin, f *protogen.File, g *protogen.Generat
 		return
 	}
 
-	// g.P("// This is a compile-time assertion to ensure that this generated file")
-	// g.P("// is compatible with the ellie package it is being compiled against.")
-
 	g.P("var _ = new(", contextPackage.Ident("Context"), ")")
 	g.P("var _ = new(", ginPackage.Ident("Engine"), ")")
+	g.P("var _ = new(", ginxPackage.Ident("Ginx"), ")")
 	g.P("var _ = new(", transportHTTPPackage.Ident("Server"), ")")
 
 	for _, service := range f.Services {
