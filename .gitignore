@@ -33,3 +33,7 @@ go.work.sum
 
 # Apple Desktop services store
 .DS_Store
+
+# Logs
+logs
+*.log
