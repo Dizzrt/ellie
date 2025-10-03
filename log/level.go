@@ -11,6 +11,8 @@ const (
 	LevelInfo
 	LevelWarn
 	LevelError
+	LevelDPanic
+	LevelPanic
 	LevelFatal
 )
 

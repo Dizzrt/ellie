@@ -2,12 +2,11 @@ package log
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sync"
 )
 
-var DefaultLogger = NewStdLogger(log.Writer())
+// var DefaultLogger = NewStdLogger(log.Writer())
 
 var global = &loggerAppliance{}
 
@@ -17,7 +16,13 @@ type loggerAppliance struct {
 }
 
 func init() {
-	global.SetLogger(DefaultLogger)
+	// TODO
+	l, err := NewStdLoggerWriter("")
+	if err != nil {
+		panic(err)
+	}
+
+	global.SetLogger(l)
 }
 
 func (a *loggerAppliance) SetLogger(writer LogWriter) {

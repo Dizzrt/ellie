@@ -1,60 +1,80 @@
 package log
 
 import (
-	"bytes"
 	"fmt"
-	"io"
-	"sync"
+
+	"github.com/Dizzrt/ellie/log/zlog"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-var _ LogWriter = (*stdLogger)(nil)
+var _ LogWriter = (*stdLoggerWriter)(nil)
 
-type stdLogger struct {
-	w         io.Writer
-	isDiscard bool
-	mu        sync.Mutex
-	pool      *sync.Pool
+type stdLoggerWriter struct {
+	zapLogger *zap.Logger
 }
 
-func NewStdLogger(w io.Writer) LogWriter {
-	return &stdLogger{
-		w:         w,
-		isDiscard: w == io.Discard,
-		pool: &sync.Pool{
-			New: func() any {
-				return new(bytes.Buffer)
-			},
-		},
+func NewStdLoggerWriterWithCustomZap(zapLogger *zap.Logger) (LogWriter, error) {
+	return &stdLoggerWriter{
+		zapLogger: zapLogger,
+	}, nil
+}
+
+func NewStdLoggerWriter(file string, opts ...zlog.Option) (LogWriter, error) {
+	zapLogger, err := zlog.New(file, opts...)
+	if err != nil {
+		return nil, err
 	}
+
+	return &stdLoggerWriter{
+		zapLogger: zapLogger,
+	}, nil
 }
 
-func (logger *stdLogger) Write(level Level, keyvals ...any) error {
-	if logger.isDiscard || len(keyvals) == 0 {
+func (logger *stdLoggerWriter) Write(level Level, keyvals ...any) error {
+	zlevel := zapcore.Level(level)
+
+	msg := ""
+	keyLen := len(keyvals)
+	if keyLen == 0 || keyLen&1 == 1 {
+		logger.zapLogger.Warn(fmt.Sprint("keyvals must appear in pairs: ", keyvals))
 		return nil
 	}
 
-	if (len(keyvals) & 1) == 1 {
-		keyvals = append(keyvals, "KEYVALS UNPAIRED")
+	data := make([]zap.Field, 0, (keyLen>>1)+1)
+	for i := 0; i < keyLen; i += 2 {
+		if keyvals[i].(string) == "msg" {
+			msg, _ = keyvals[i+1].(string)
+			continue
+		}
+
+		data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
 	}
 
-	buf := logger.pool.Get().(*bytes.Buffer)
-	defer logger.pool.Put(buf)
-
-	buf.WriteString(level.String())
-	for i := 0; i < len(keyvals); i += 2 {
-		fmt.Fprintf(buf, " %s=%v", keyvals[i], keyvals[i+1])
+	switch zlevel {
+	case zapcore.DebugLevel:
+		logger.zapLogger.Debug(msg, data...)
+	case zapcore.InfoLevel:
+		logger.zapLogger.Info(msg, data...)
+	case zapcore.WarnLevel:
+		logger.zapLogger.Warn(msg, data...)
+	case zapcore.ErrorLevel:
+		logger.zapLogger.Error(msg, data...)
+	case zapcore.DPanicLevel:
+		logger.zapLogger.DPanic(msg, data...)
+	case zapcore.PanicLevel:
+		logger.zapLogger.Panic(msg, data...)
+	case zapcore.FatalLevel:
+		logger.zapLogger.Fatal(msg, data...)
 	}
 
-	buf.WriteByte('\n')
-	defer buf.Reset()
-
-	logger.mu.Lock()
-	defer logger.mu.Unlock()
-	_, err := logger.w.Write(buf.Bytes())
-
-	return err
+	return nil
 }
 
-func (logger *stdLogger) Close() error {
-	return nil
+func (logger *stdLoggerWriter) Sync() error {
+	return logger.zapLogger.Sync()
+}
+
+func (logger *stdLoggerWriter) Close() error {
+	return logger.Sync()
 }
