@@ -3,7 +3,7 @@ module github.com/Dizzrt/ellie
 go 1.25.1
 
 require (
-	github.com/Dizzrt/filerotator v0.1.0
+	github.com/Dizzrt/filerotator v0.2.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/go-viper/mapstructure/v2 v2.4.0

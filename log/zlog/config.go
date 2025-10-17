@@ -18,10 +18,8 @@ const (
 )
 
 type config struct {
-	Level zapcore.Level
-
-	Suffix   string
-	LinkFile string
+	Level   zapcore.Level
+	Symlink string
 
 	Clock        filerotator.Clock
 	RotateType   filerotator.RotateType
@@ -40,8 +38,8 @@ type config struct {
 
 func defaultConfig() *config {
 	return &config{
-		Suffix:   "log",
-		LinkFile: "",
+		Level:   zapcore.InfoLevel,
+		Symlink: "",
 
 		Clock:        filerotator.Local,          // default to local time
 		RotateType:   filerotator.RotateTypeTime, // default to roatate by time
@@ -64,9 +62,27 @@ func (conf *config) toFileRotatorOptions() []filerotator.Option {
 		filerotator.WithRotationSize(conf.RotationSize),
 		filerotator.WithMaxAge(conf.MaxAge),
 		filerotator.WithMaxBackup(conf.MaxBackups),
-		filerotator.WithLinkName(conf.LinkFile),
-		filerotator.WithSuffix(conf.Suffix),
+		filerotator.WithSymlink(conf.Symlink),
 	}
 
 	return opts
+}
+
+func ParseOutputType(outputType string) outputType {
+	switch outputType {
+	case "none":
+		return OutputType_None
+	case "both":
+		return OutputType_Both
+	case "file":
+		return OutputType_File
+	case "console":
+		return OutputType_Console
+	default:
+		return OutputType_File
+	}
+}
+
+func ParseRotationType(rotateType string) filerotator.RotateType {
+	return filerotator.ParseRotationType(rotateType)
 }

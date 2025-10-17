@@ -16,15 +16,9 @@ func Level(level zapcore.Level) Option {
 	}
 }
 
-func Suffix(suffix string) Option {
+func Symlink(symlink string) Option {
 	return func(conf *config) {
-		conf.Suffix = suffix
-	}
-}
-
-func LinkFile(linkFile string) Option {
-	return func(conf *config) {
-		conf.LinkFile = linkFile
+		conf.Symlink = symlink
 	}
 }
 
