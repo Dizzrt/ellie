@@ -1,6 +1,6 @@
 module github.com/Dizzrt/ellie
 
-go 1.25.1
+go 1.25
 
 require (
 	github.com/Dizzrt/filerotator v0.2.0
