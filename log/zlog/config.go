@@ -86,3 +86,12 @@ func ParseOutputType(outputType string) outputType {
 func ParseRotationType(rotateType string) filerotator.RotateType {
 	return filerotator.ParseRotationType(rotateType)
 }
+
+func ParseLevel(level string) zapcore.Level {
+	l, err := zapcore.ParseLevel(level)
+	if err != nil {
+		l = zapcore.InfoLevel
+	}
+
+	return l
+}
