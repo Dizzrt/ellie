@@ -9,12 +9,22 @@ import (
 )
 
 func TestStdLoggerWriter(t *testing.T) {
-	writer, err := NewStdLoggerWriter("logs/log")
+	writer, err := NewStdLoggerWriter("logs/test.log",
+		zlog.ZapOpts(
+			zap.AddCaller(),
+			zap.AddStacktrace(zapcore.ErrorLevel),
+		),
+	)
+
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	writer.Write(LevelInfo, "hello")
+	writer.Write(LevelDebug, "msg", "debug message")
+	writer.Write(LevelInfo, "msg", "info message")
+	writer.Write(LevelWarn, "msg", "warn message")
+	writer.Write(LevelError, "msg", "error message")
+
 	writer.(*stdLoggerWriter).Sync()
 }
 
