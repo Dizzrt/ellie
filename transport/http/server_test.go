@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 	nhttp "net/http"
 
 	"github.com/Dizzrt/ellie/internal/mock/ping"
+	"github.com/Dizzrt/ellie/middleware/tracing"
 	"github.com/Dizzrt/ellie/transport/http"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
@@ -63,6 +65,82 @@ func TestHTTPServer(t *testing.T) {
 	time.Sleep(time.Second)
 
 	//
+	e, err := srv.Endpoint()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	url := e.String() + "/hello/ellie?type=mock"
+	// resp, err := nhttp.Post(url, "application/json", strings.NewReader(``))
+	resp, err := nhttp.Post(url, "application/json", strings.NewReader(`{"name": "ellieFromBody","type": "mockFromBody"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	// if resp.statusCode != http.StatusOK {
+	// 	t.Fatal(resp.statusCode)
+	// }
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(string(body))
+	_ = srv.Stop(ctx)
+}
+
+func TestHTTPServerWithTracing(t *testing.T) {
+	ctx := context.Background()
+
+	// init tracing provider
+	tp, err := tracing.Initialize(ctx,
+		tracing.ServiceName("transport-test"),
+		tracing.ServiceVersion("v0.0.1-dev"),
+		tracing.Endpoint("localhost:4318"),
+		tracing.EndpointType(tracing.EndpointType_HTTP),
+		tracing.Insecure(true),
+		tracing.Metadata(map[string]string{
+			"ip":  "127.0.0.1",
+			"env": "dev",
+		}),
+	)
+	if err != nil {
+		log.Fatalf("init tracing provider failed: %v", err)
+	}
+
+	defer func() {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		tp.Shutdown(ctx)
+	}()
+
+	var opts = []http.ServerOption{
+		http.DefaultSuccessCode(10000),
+		http.DefaultSuccessMessage("success"),
+		http.ResponseEncoder(func(data any, err error, s *http.Server) (int, render.Render) {
+			code := http.HTTPStatusCodeFromError(err)
+			r := render.JSON{Data: gin.H{
+				"data": data,
+				"err":  err,
+				"ext":  "custom response encoder",
+			}}
+			return code, r
+		}),
+	}
+
+	srv := http.NewServer(opts...)
+	srv.Engine().Use(tracing.Tracing())
+	ping.RegisterPingServiceHTTPServer(srv, &pingServer{})
+	go func() {
+		if err := srv.Start(ctx); err != nil {
+			panic(err)
+		}
+	}()
+
+	time.Sleep(time.Second)
+
 	e, err := srv.Endpoint()
 	if err != nil {
 		t.Fatal(err)

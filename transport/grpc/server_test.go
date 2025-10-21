@@ -4,12 +4,14 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"log"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/Dizzrt/ellie/internal/mock/ping"
+	"github.com/Dizzrt/ellie/middleware/tracing"
 	"google.golang.org/grpc"
 )
 
@@ -27,9 +29,9 @@ type testKey struct{}
 
 func getPingServer(t *testing.T, opts ...ServerOption) *Server {
 	opts = append(opts,
-		UnaryInterceptor(func(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
-			return handler(ctx, req)
-		}),
+		UnaryInterceptor(
+			tracing.UnaryServerInterceptor(),
+		),
 		Options(grpc.InitialConnWindowSize(0)),
 	)
 
@@ -164,5 +166,71 @@ func TestPingWithTLS(t *testing.T) {
 
 	t.Log(resp)
 
+	_ = srv.Stop(ctx)
+}
+
+func TestPingWithTracing(t *testing.T) {
+	ctx := context.Background()
+
+	// init tracing provider
+	tp, err := tracing.Initialize(ctx,
+		tracing.ServiceName("transport-test"),
+		tracing.ServiceVersion("v0.0.1-dev"),
+		tracing.Endpoint("localhost:4317"),
+		tracing.EndpointType(tracing.EndpointType_GRPC),
+		tracing.Insecure(true),
+		tracing.Metadata(map[string]string{
+			"ip":  "127.0.0.1",
+			"env": "dev",
+		}),
+	)
+	if err != nil {
+		log.Fatalf("init tracing provider failed: %v", err)
+	}
+
+	defer func() {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		tp.Shutdown(ctx)
+	}()
+
+	// start server
+	srv := getPingServer(t)
+	go func() {
+		if err := srv.Start(ctx); err != nil {
+			panic(err)
+		}
+	}()
+
+	time.Sleep(time.Second)
+
+	// client
+	e, err := srv.Endpoint()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := DialInsecure(
+		WithEndpoint(e.Host),
+		WithUnaryClientInterceptor(
+			tracing.UnaryClientInterceptor(),
+		),
+	)
+
+	defer func() {
+		_ = conn.Close()
+	}()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	client := ping.NewPingServiceClient(conn)
+	resp, err := client.Ping(ctx, &ping.PingRequest{})
+	if err != nil {
+		t.Errorf("failed to call with error: %v", err)
+	}
+
+	t.Log(resp)
 	_ = srv.Stop(ctx)
 }

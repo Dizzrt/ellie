@@ -59,18 +59,12 @@ func NewServer(opts ...ServerOption) *Server {
 		opt(srv)
 	}
 
-	unaryInts := []grpc.UnaryServerInterceptor{
-		// TODO unaryInts
-	}
-
+	unaryInts := []grpc.UnaryServerInterceptor{}
 	if len(srv.unaryInts) > 0 {
 		unaryInts = append(unaryInts, srv.unaryInts...)
 	}
 
-	streamInts := []grpc.StreamServerInterceptor{
-		// TODO streamInts
-	}
-
+	streamInts := []grpc.StreamServerInterceptor{}
 	if len(srv.streamInts) > 0 {
 		streamInts = append(streamInts, srv.streamInts...)
 	}
