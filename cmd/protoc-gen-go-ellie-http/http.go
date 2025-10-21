@@ -19,6 +19,8 @@ const (
 	ginPackage           = protogen.GoImportPath("github.com/gin-gonic/gin")
 	transportHTTPPackage = protogen.GoImportPath("github.com/Dizzrt/ellie/transport/http")
 	ginxPackage          = protogen.GoImportPath("github.com/Dizzrt/ellie/transport/http/ginx")
+	otelPackage          = protogen.GoImportPath("go.opentelemetry.io/otel")
+	tracePackage         = protogen.GoImportPath("go.opentelemetry.io/otel/trace")
 
 	deprecationComment = "// Deprecated: Do not use."
 )
@@ -58,6 +60,8 @@ func generateContent(gen *protogen.Plugin, f *protogen.File, g *protogen.Generat
 	g.P("var _ = new(", ginPackage.Ident("Engine"), ")")
 	g.P("var _ = new(", ginxPackage.Ident("Ginx"), ")")
 	g.P("var _ = new(", transportHTTPPackage.Ident("Server"), ")")
+	g.P("var _ = ", otelPackage.Ident("Tracer"))
+	g.P("var _ = new(", tracePackage.Ident("Span"), ")")
 
 	for _, service := range f.Services {
 		genService(gen, f, g, service, omitempty, omitemptyPrefix)
@@ -75,6 +79,7 @@ func genService(_ *protogen.Plugin, f *protogen.File, g *protogen.GeneratedFile,
 		ServiceType: service.GoName,
 		ServiceName: string(service.Desc.Name()),
 		Metadata:    f.Desc.Path(),
+		PackagePath: string(f.GoImportPath),
 	}
 
 	for _, method := range service.Methods {

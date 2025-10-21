@@ -1,6 +1,8 @@
 {{$svrType := .ServiceType}}
 {{$svrName := .ServiceName}}
 
+const TRACER_NAME = "{{$.PackagePath}}"
+
 {{- range .MethodSets}}
 const Operation{{$svrType}}{{.OriginalName}} = "/{{$svrName}}/{{.OriginalName}}"
 {{- end}}
@@ -32,7 +34,16 @@ func _{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler(hs *http.Server, srv {{$svrTy
 			return
 		}
 
-        res, err := srv.{{.Name}}(ctx.Request.Context(), &req)
+        sctx := ctx.Request.Context()
+        tracer := otel.Tracer(TRACER_NAME)
+		sctx, span := tracer.Start(sctx, "_{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler",
+			trace.WithSpanKind(trace.SpanKindServer),
+			trace.WithAttributes(),
+		)
+		defer span.End()
+
+        res, err := srv.{{.Name}}(sctx, &req)
+        ctx.Request = ctx.Request.WithContext(sctx)
 		if err != nil {
 			ctx.JSON(http.HTTPStatusCodeFromError(err), hs.WrapHTTPResponse(res, err))
 			ctx.Abort()

@@ -14,6 +14,7 @@ type serviceDesc struct {
 	ServiceType string
 	ServiceName string
 	Metadata    string
+	PackagePath string
 	Methods     []*methodDesc
 	MethodSets  map[string]*methodDesc
 }
