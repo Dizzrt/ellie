@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ellie.errors;
 
-option go_package = "github.com/Dizzrt/ellie/errors;errors";
+option go_package = "github.com/dizzrt/ellie/errors;errors";
 
 import "google/protobuf/descriptor.proto";
 

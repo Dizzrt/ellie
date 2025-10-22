@@ -4,7 +4,7 @@ package ping;
 
 import "google/api/annotations.proto";
 
-option go_package = "github.com/Dizzrt/ellie/internal/mock/ping";
+option go_package = "github.com/dizzrt/ellie/internal/mock/ping";
 
 service PingService {
   rpc Ping(PingRequest) returns (PingResponse) {

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Dizzrt/ellie/internal/mock/ping"
-	"github.com/Dizzrt/ellie/middleware/tracing"
+	"github.com/dizzrt/ellie/internal/mock/ping"
+	"github.com/dizzrt/ellie/middleware/tracing"
 	"google.golang.org/grpc"
 )
 

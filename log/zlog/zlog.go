@@ -3,7 +3,7 @@ package zlog
 import (
 	"os"
 
-	"github.com/Dizzrt/filerotator"
+	"github.com/dizzrt/filerotator"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

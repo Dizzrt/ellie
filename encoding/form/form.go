@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/Dizzrt/ellie/encoding"
+	"github.com/dizzrt/ellie/encoding"
 	"github.com/go-playground/form/v4"
 	"google.golang.org/protobuf/proto"
 )

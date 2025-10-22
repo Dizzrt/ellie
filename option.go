@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Dizzrt/ellie/log"
-	"github.com/Dizzrt/ellie/registry"
-	"github.com/Dizzrt/ellie/transport"
+	"github.com/dizzrt/ellie/log"
+	"github.com/dizzrt/ellie/registry"
+	"github.com/dizzrt/ellie/transport"
 )
 
 type Option func(opts *options)

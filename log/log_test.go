@@ -3,7 +3,7 @@ package log
 import (
 	"testing"
 
-	"github.com/Dizzrt/ellie/log/zlog"
+	"github.com/dizzrt/ellie/log/zlog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

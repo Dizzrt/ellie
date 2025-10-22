@@ -3,8 +3,8 @@ package http
 import (
 	"net/url"
 
-	"github.com/Dizzrt/ellie/encoding"
-	"github.com/Dizzrt/ellie/encoding/form"
+	"github.com/dizzrt/ellie/encoding"
+	"github.com/dizzrt/ellie/encoding/form"
 )
 
 func BindQueryParams(vars url.Values, target any) error {

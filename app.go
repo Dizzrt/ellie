@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Dizzrt/ellie/log"
-	"github.com/Dizzrt/ellie/registry"
-	"github.com/Dizzrt/ellie/transport"
+	"github.com/dizzrt/ellie/log"
+	"github.com/dizzrt/ellie/registry"
+	"github.com/dizzrt/ellie/transport"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 )

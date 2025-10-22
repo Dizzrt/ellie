@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/Dizzrt/ellie/errors"
+	"github.com/dizzrt/ellie/errors"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

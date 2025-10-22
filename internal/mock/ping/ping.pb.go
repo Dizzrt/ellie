@@ -211,12 +211,12 @@ const file_ping_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\")\n" +
 	"\rHelloResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xcd\x01\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\xd0\x01\n" +
 	"\vPingService\x12<\n" +
 	"\x04Ping\x12\x11.ping.PingRequest\x1a\x12.ping.PingResponse\"\r\x82\xd3\xe4\x93\x02\a\x12\x05/ping\x127\n" +
 	"\n" +
-	"PingStream\x12\x11.ping.PingRequest\x1a\x12.ping.PingResponse(\x010\x01\x12G\n" +
-	"\x05Hello\x12\x12.ping.HelloRequest\x1a\x13.ping.HelloResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/hello/{name}B,Z*github.com/Dizzrt/ellie/internal/mock/pingb\x06proto3"
+	"PingStream\x12\x11.ping.PingRequest\x1a\x12.ping.PingResponse(\x010\x01\x12J\n" +
+	"\x05Hello\x12\x12.ping.HelloRequest\x1a\x13.ping.HelloResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/hello/{name}B,Z*github.com/dizzrt/ellie/internal/mock/pingb\x06proto3"
 
 var (
 	file_ping_proto_rawDescOnce sync.Once

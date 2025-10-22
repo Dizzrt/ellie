@@ -9,11 +9,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Dizzrt/ellie/errors"
-	"github.com/Dizzrt/ellie/internal/endpoint"
-	"github.com/Dizzrt/ellie/internal/host"
-	"github.com/Dizzrt/ellie/log"
-	"github.com/Dizzrt/ellie/transport"
+	"github.com/dizzrt/ellie/errors"
+	"github.com/dizzrt/ellie/internal/endpoint"
+	"github.com/dizzrt/ellie/internal/host"
+	"github.com/dizzrt/ellie/log"
+	"github.com/dizzrt/ellie/transport"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/status"
 )

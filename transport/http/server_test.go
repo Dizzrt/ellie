@@ -11,9 +11,9 @@ import (
 
 	nhttp "net/http"
 
-	"github.com/Dizzrt/ellie/internal/mock/ping"
-	"github.com/Dizzrt/ellie/middleware/tracing"
-	"github.com/Dizzrt/ellie/transport/http"
+	"github.com/dizzrt/ellie/internal/mock/ping"
+	"github.com/dizzrt/ellie/middleware/tracing"
+	"github.com/dizzrt/ellie/transport/http"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
 	"google.golang.org/grpc/codes"

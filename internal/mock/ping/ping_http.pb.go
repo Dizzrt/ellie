@@ -8,8 +8,9 @@ package ping
 
 import (
 	context "context"
-	http "github.com/Dizzrt/ellie/transport/http"
-	ginx "github.com/Dizzrt/ellie/transport/http/ginx"
+
+	http "github.com/dizzrt/ellie/transport/http"
+	ginx "github.com/dizzrt/ellie/transport/http/ginx"
 	gin "github.com/gin-gonic/gin"
 	otel "go.opentelemetry.io/otel"
 	trace "go.opentelemetry.io/otel/trace"
@@ -22,7 +23,7 @@ var _ = new(http.Server)
 var _ = otel.Tracer
 var _ = new(trace.Span)
 
-const TRACER_NAME = "github.com/Dizzrt/ellie/internal/mock/ping"
+const TRACER_NAME = "github.com/dizzrt/ellie/internal/mock/ping"
 const OperationPingServiceHello = "/PingService/Hello"
 const OperationPingServicePing = "/PingService/Ping"
 

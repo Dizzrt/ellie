@@ -1,9 +1,9 @@
-module github.com/Dizzrt/ellie
+module github.com/dizzrt/ellie
 
 go 1.25
 
 require (
-	github.com/Dizzrt/filerotator v0.2.0
+	github.com/dizzrt/filerotator v0.2.1
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/go-viper/mapstructure/v2 v2.4.0

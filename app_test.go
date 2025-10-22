@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Dizzrt/ellie/internal/mock/ping"
-	"github.com/Dizzrt/ellie/transport/grpc"
-	"github.com/Dizzrt/ellie/transport/http"
+	"github.com/dizzrt/ellie/internal/mock/ping"
+	"github.com/dizzrt/ellie/transport/grpc"
+	"github.com/dizzrt/ellie/transport/http"
 )
 
 type pingServer struct {
