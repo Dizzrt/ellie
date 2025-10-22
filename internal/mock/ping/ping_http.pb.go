@@ -8,7 +8,6 @@ package ping
 
 import (
 	context "context"
-
 	http "github.com/dizzrt/ellie/transport/http"
 	ginx "github.com/dizzrt/ellie/transport/http/ginx"
 	gin "github.com/gin-gonic/gin"

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/Dizzrt/ellie/errors"
+	"github.com/dizzrt/ellie/errors"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -19,7 +19,7 @@ const (
 
 	// packages
 	fmtPackage    = protogen.GoImportPath("fmt")
-	errorsPackage = protogen.GoImportPath("github.com/Dizzrt/ellie/errors")
+	errorsPackage = protogen.GoImportPath("github.com/dizzrt/ellie/errors")
 )
 
 var showVersion = flag.Bool("version", false, "print the version and exit")

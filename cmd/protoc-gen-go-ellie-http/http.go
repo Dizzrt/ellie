@@ -17,8 +17,8 @@ import (
 const (
 	contextPackage       = protogen.GoImportPath("context")
 	ginPackage           = protogen.GoImportPath("github.com/gin-gonic/gin")
-	transportHTTPPackage = protogen.GoImportPath("github.com/Dizzrt/ellie/transport/http")
-	ginxPackage          = protogen.GoImportPath("github.com/Dizzrt/ellie/transport/http/ginx")
+	transportHTTPPackage = protogen.GoImportPath("github.com/dizzrt/ellie/transport/http")
+	ginxPackage          = protogen.GoImportPath("github.com/dizzrt/ellie/transport/http/ginx")
 	otelPackage          = protogen.GoImportPath("go.opentelemetry.io/otel")
 	tracePackage         = protogen.GoImportPath("go.opentelemetry.io/otel/trace")
 
