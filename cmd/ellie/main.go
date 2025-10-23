@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Dizzrt/ellie/cmd/ellie/cmd"
+import "github.com/dizzrt/ellie/cmd/ellie/cmd"
 
 func main() {
 	cmd.Execute()
