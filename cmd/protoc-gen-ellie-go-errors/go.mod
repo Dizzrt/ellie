@@ -1,4 +1,4 @@
-module github.com/dizzrt/ellie/cmd/protoc-gen-go-ellie-errors
+module github.com/dizzrt/ellie/cmd/protoc-gen-ellie-go-errors
 
 go 1.25
 

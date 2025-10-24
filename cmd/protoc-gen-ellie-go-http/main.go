@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-const release = "v1.1.0"
+const release = "v1.1.1"
 
 var (
 	showVersion     = flag.Bool("version", false, "print the version and exit")
@@ -19,7 +19,7 @@ var (
 func main() {
 	flag.Parse()
 	if *showVersion {
-		fmt.Printf("protoc-gen-go-http %v\n", release)
+		fmt.Printf("protoc-gen-ellie-go-http %v\n", release)
 		return
 	}
 

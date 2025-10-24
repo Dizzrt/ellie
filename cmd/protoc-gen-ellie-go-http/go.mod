@@ -1,4 +1,4 @@
-module github.com/dizzrt/ellie/cmd/protoc-gen-go-ellie-http
+module github.com/dizzrt/ellie/cmd/protoc-gen-ellie-go-http
 
 go 1.25
 

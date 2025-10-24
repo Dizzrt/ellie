@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	release = "v1.0.0"
+	release = "v1.0.1"
 
 	// packages
 	fmtPackage    = protogen.GoImportPath("fmt")
