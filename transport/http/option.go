@@ -75,3 +75,9 @@ func NoMethodHandlers(handler gin.HandlerFunc) ServerOption {
 		s.NoMethodHandler = append(s.NoMethodHandler, handler)
 	}
 }
+
+func Middleware(middleware ...gin.HandlerFunc) ServerOption {
+	return func(s *Server) {
+		s.engine.Use(middleware...)
+	}
+}

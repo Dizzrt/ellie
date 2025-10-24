@@ -128,10 +128,10 @@ func TestHTTPServerWithTracing(t *testing.T) {
 			}}
 			return code, r
 		}),
+		http.Middleware(tracing.Tracing()),
 	}
 
 	srv := http.NewServer(opts...)
-	srv.Engine().Use(tracing.Tracing())
 	ping.RegisterPingServiceHTTPServer(srv, &pingServer{})
 	go func() {
 		if err := srv.Start(ctx); err != nil {
