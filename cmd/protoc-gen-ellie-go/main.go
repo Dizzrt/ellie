@@ -6,9 +6,10 @@ import (
 
 	gengo "google.golang.org/protobuf/cmd/protoc-gen-go/internal_gengo"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
-const release = "v1.0.0"
+const release = "v1.0.1"
 const baseProtobufRelease = "v1.36.10"
 
 var showVersion = flag.Bool("version", false, "print the version and exit")
@@ -42,6 +43,7 @@ func main() {
 		ParamFunc:         flags.Set,
 		ImportRewriteFunc: importRewriteFunc,
 	}.Run(func(gen *protogen.Plugin) error {
+		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 		for _, f := range gen.Files {
 			if !f.Generate {
 				continue
@@ -50,7 +52,6 @@ func main() {
 			gengo.GenerateFile(gen, f)
 		}
 
-		gen.SupportedFeatures = gengo.SupportedFeatures
 		return nil
 	})
 }
