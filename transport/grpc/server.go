@@ -132,7 +132,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 
 	s.baseCtx = ctx
-	log.Infof("[gRPC] server listening on %s\n", s.lis.Addr().String())
+	log.Infof("[gRPC] server listening on %s", s.lis.Addr().String())
 
 	if !s.customHealth {
 		s.health.Resume()
