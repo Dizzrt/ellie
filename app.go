@@ -189,6 +189,7 @@ func (app *App) Stop() error {
 		app.cancel()
 	}
 
+	log.Sync()
 	return err
 }
 
