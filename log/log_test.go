@@ -1,6 +1,7 @@
 package log
 
 import (
+	"context"
 	"testing"
 
 	"github.com/dizzrt/ellie/log/zlog"
@@ -57,4 +58,25 @@ func TestLogger(t *testing.T) {
 	// logger.Fatal("fatal message")
 
 	logger.writer.(*stdLoggerWriter).Sync()
+}
+
+func TestGlobalCtxLog(t *testing.T) {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, LogID, "123456789abc")
+	ctx = context.WithValue(ctx, TraceID, "trace123456789")
+	ctx = context.WithValue(ctx, SpanID, "span123456789")
+
+	CtxDebug(ctx, "debug message")
+	CtxDebugf(ctx, "debugf message: %d", 123)
+	CtxDebugw(ctx, "msgx", "xxx", "key1", "value1", "key2", 2)
+	CtxInfow(ctx, "msg", "infow message", "key1", "value1", "key2", 2, "key1", "value11")
+	CtxInfo(ctx, "info message")
+	CtxWarn(ctx, "warn message")
+	CtxError(ctx, "error message")
+	CtxErrorf(ctx, "errorf message: %d", 123)
+	CtxErrorw(ctx, "msgx", "xxx", "key1", "value1", "key2", 2)
+	// CtxFatal(ctx, "fatal message")
+	// CtxFatalf(ctx, "fatalf message: %d", 123)
+
+	Sync()
 }

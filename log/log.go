@@ -11,6 +11,10 @@ type LogWriter interface {
 	Write(level Level, keyvals ...any) error
 }
 
+type LogAsyncWriter interface {
+	Sync() error
+}
+
 type Logger struct {
 	writer  LogWriter
 	msgKey  string
