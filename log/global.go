@@ -132,9 +132,9 @@ func fromCtx(ctx context.Context, kvs ...any) []any {
 		return kvs
 	}
 
-	for _, k := range fromCtxKeys {
-		if v := ctx.Value(k); v != nil {
-			kvs = append(kvs, k, v)
+	for _, k := range ctxKeyMappings {
+		if v := ctx.Value(k.key); v != nil {
+			kvs = append(kvs, k.name, v)
 		}
 	}
 

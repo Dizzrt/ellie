@@ -62,9 +62,9 @@ func TestLogger(t *testing.T) {
 
 func TestGlobalCtxLog(t *testing.T) {
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, LogID, "123456789abc")
-	ctx = context.WithValue(ctx, TraceID, "trace123456789")
-	ctx = context.WithValue(ctx, SpanID, "span123456789")
+	ctx = WithLogID(ctx, "123456789abc")
+	ctx = WithSpanID(ctx, "span123456789")
+	ctx = WithTraceID(ctx, "trace123456789")
 
 	CtxDebug(ctx, "debug message")
 	CtxDebugf(ctx, "debugf message: %d", 123)
