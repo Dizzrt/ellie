@@ -128,7 +128,7 @@ func TestHTTPServerWithTracing(t *testing.T) {
 			}}
 			return code, r
 		}),
-		http.Middleware(tracing.Tracing()),
+		http.Middleware(tracing.TracingMiddleware()),
 	}
 
 	srv := http.NewServer(opts...)

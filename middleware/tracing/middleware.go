@@ -126,7 +126,7 @@ func StreamClientInterceptor() grpc.StreamClientInterceptor {
 }
 
 // gin middleware for tracing
-func Tracing() gin.HandlerFunc {
+func TracingMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		req := ctx.Request
 		rawCtx := req.Context()
