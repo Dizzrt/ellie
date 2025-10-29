@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-func TestIDUint128(t *testing.T) {
-	id := NewIDUint128(time.Now(), 0)
-	fmt.Println(id.String())
-}
-
 func TestGenerator(t *testing.T) {
 	gen := NewGenerator()
 
@@ -41,4 +36,8 @@ func TestGlobalGenerator(t *testing.T) {
 	}
 
 	wg.Wait()
+}
+
+func TestID128Bits(t *testing.T) {
+	fmt.Println(NewID128Bits(time.Now(), 0))
 }
