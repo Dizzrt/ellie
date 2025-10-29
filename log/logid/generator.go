@@ -7,8 +7,6 @@ import (
 
 var _ Generator = (*generator)(nil)
 
-const _SEQUENCE_MASK = 0xFFF
-
 type generator struct {
 	mu            sync.Mutex
 	seq           int
@@ -22,7 +20,7 @@ func (gen *generator) Generate() LogID {
 	now := time.Now()
 	mill := now.UnixMilli()
 	if mill == gen.millTimestamp {
-		gen.seq = (gen.seq + 1) & _SEQUENCE_MASK
+		gen.seq = gen.seq + 1
 	} else {
 		gen.seq = 0
 	}
