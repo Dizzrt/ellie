@@ -26,25 +26,68 @@ func TestGenerator(t *testing.T) {
 
 func TestGlobalGenerator(t *testing.T) {
 	wg := sync.WaitGroup{}
+	wg.Add(10)
+
+	mu := sync.Mutex{}
+	ids := make([]string, 0, 1000)
+	for range 10 {
+		go func() {
+			subIds := make([]string, 0, 1000)
+			for range 1000 {
+				id := Generate()
+				subIds = append(subIds, id.String())
+			}
+
+			mu.Lock()
+			ids = append(ids, subIds...)
+			mu.Unlock()
+
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+	slices.Sort(ids)
+	fmt.Println(ids)
+}
+
+func TestGlobalGeneratorRepeatCheck(t *testing.T) {
+	wg := sync.WaitGroup{}
+	wg.Add(10)
 
 	mu := sync.Mutex{}
 	ids := make([]string, 0, 10000)
-
-	wg.Add(10000)
-	for range 10000 {
+	for range 10 {
 		go func() {
-			id := Generate()
+			subIds := make([]string, 0, 1000)
+			for range 1000 {
+				id := Generate()
+				subIds = append(subIds, id.String())
+			}
+
 			mu.Lock()
-			ids = append(ids, id.String())
+			ids = append(ids, subIds...)
 			mu.Unlock()
+
 			wg.Done()
 		}()
 	}
 
 	wg.Wait()
 
-	slices.Sort(ids)
-	fmt.Println(ids)
+	mp := make(map[string]int)
+	for _, id := range ids {
+		temp := id[:21]
+		mp[temp]++
+	}
+
+	for k, v := range mp {
+		if v > 1 {
+			fmt.Println(k, v)
+		}
+	}
+
+	fmt.Println(len(ids), len(mp))
 }
 
 func TestID128Bits(t *testing.T) {

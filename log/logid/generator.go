@@ -15,7 +15,6 @@ type generator struct {
 
 func (gen *generator) Generate() LogID {
 	gen.mu.Lock()
-	defer gen.mu.Unlock()
 
 	now := time.Now()
 	mill := now.UnixMilli()
@@ -26,7 +25,10 @@ func (gen *generator) Generate() LogID {
 	}
 
 	gen.millTimestamp = mill
-	return NewID128Bits(now, gen.seq)
+	seq := gen.seq
+	gen.mu.Unlock()
+
+	return NewID128Bits(now, seq)
 }
 
 func NewGenerator() Generator {
