@@ -34,16 +34,28 @@ func _{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler(hs *http.Server, srv {{$svrTy
 			return
 		}
 
-        sctx := ctx.Request.Context()
+        greq := ctx.Request
+		rctx := greq.Context()
+		rctx = log.ExtractFromTextMapCarrier(rctx, propagation.HeaderCarrier(greq.Header))
+		attributes := []attribute.KeyValue{
+			v1_21_0.HTTPRequestMethodKey.String(greq.Method),
+			v1_21_0.HTTPRouteKey.String(greq.URL.String()),
+			attribute.String("log.id", log.LogIDFromContext(rctx)),
+		}
+
         tracer := otel.Tracer(TRACER_NAME)
-		sctx, span := tracer.Start(sctx, "_{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler",
+		rctx, span := tracer.Start(rctx, "_{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler",
 			trace.WithSpanKind(trace.SpanKindServer),
-			trace.WithAttributes(),
+			trace.WithAttributes(attributes...),
 		)
 		defer span.End()
 
-        res, err := srv.{{.Name}}(sctx, &req)
-        ctx.Request = ctx.Request.WithContext(sctx)
+        sctx := span.SpanContext()
+		rctx = log.WithTraceID(rctx, sctx.TraceID().String())
+		rctx = log.WithSpanID(rctx, sctx.SpanID().String())
+
+        res, err := srv.{{.Name}}(rctx, &req)
+        ctx.Request = ctx.Request.WithContext(rctx)
 		if err != nil {
 			ctx.JSON(http.HTTPStatusCodeFromError(err), hs.WrapHTTPResponse(res, err))
 			ctx.Abort()

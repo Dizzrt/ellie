@@ -4,6 +4,8 @@ import (
 	"context"
 	"path"
 
+	"github.com/dizzrt/ellie/log"
+	"github.com/dizzrt/ellie/log/logid"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -53,6 +55,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 		if ok {
 			carrier := &metadataCarrier{md: md}
 			ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
+			ctx = log.ExtractFromTextMapCarrier(ctx, carrier)
 		}
 
 		tracer := otel.Tracer(grpcServerTracerName)
@@ -61,10 +64,15 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 		ctx, span := tracer.Start(ctx, spanName, trace.WithSpanKind(trace.SpanKindServer))
 		defer span.End()
 
+		sctx := span.SpanContext()
+		ctx = log.WithTraceID(ctx, sctx.TraceID().String())
+		ctx = log.WithSpanID(ctx, sctx.SpanID().String())
+
 		span.SetAttributes(
 			attribute.String("rpc.system", "grpc"),
 			attribute.String("rpc.service", path.Dir(info.FullMethod)[1:]),
 			attribute.String("rpc.method", path.Base(info.FullMethod)),
+			attribute.String("log.id", log.LogIDFromContext(ctx)),
 		)
 
 		resp, err := handler(ctx, req)
@@ -93,10 +101,16 @@ func UnaryClientInterceptor() grpc.UnaryClientInterceptor {
 		ctx, span := tracer.Start(ctx, spanName, trace.WithSpanKind(trace.SpanKindClient))
 		defer span.End()
 
+		var logID string
+		if logID = log.LogIDFromContext(ctx); logID == "" {
+			logID = logid.Generate().String()
+		}
+
 		span.SetAttributes(
 			attribute.String("rpc.system", "grpc"),
 			attribute.String("rpc.service", path.Dir(method)[1:]),
 			attribute.String("rpc.method", path.Base(method)),
+			attribute.String("log.id", logID),
 		)
 
 		md, ok := metadata.FromOutgoingContext(ctx)
@@ -106,8 +120,9 @@ func UnaryClientInterceptor() grpc.UnaryClientInterceptor {
 
 		carrier := &metadataCarrier{md: md}
 		otel.GetTextMapPropagator().Inject(ctx, carrier)
-		ctx = metadata.NewOutgoingContext(ctx, md)
+		md.Set("log.id", logID)
 
+		ctx = metadata.NewOutgoingContext(ctx, md)
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			span.SetStatus(codes.Error, err.Error())
@@ -129,24 +144,32 @@ func StreamClientInterceptor() grpc.StreamClientInterceptor {
 func TracingMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		req := ctx.Request
-		rawCtx := req.Context()
+		rctx := req.Context()
 
 		propagator := otel.GetTextMapPropagator()
-		rawCtx = propagator.Extract(rawCtx, propagation.HeaderCarrier(req.Header))
+		rctx = propagator.Extract(rctx, propagation.HeaderCarrier(req.Header))
+		rctx = log.ExtractFromTextMapCarrier(rctx, propagation.HeaderCarrier(req.Header))
+
+		attributes := []attribute.KeyValue{
+			semconv.HTTPRequestMethodKey.String(req.Method),
+			semconv.HTTPRouteKey.String(req.URL.String()),
+			attribute.String("log.id", log.LogIDFromContext(rctx)),
+		}
 
 		tracer := otel.Tracer(httpTracerName)
-		rawCtx, span := tracer.Start(
-			rawCtx,
+		rctx, span := tracer.Start(
+			rctx,
 			req.Method+" "+req.URL.Path,
 			trace.WithSpanKind(trace.SpanKindServer),
-			trace.WithAttributes(
-				semconv.HTTPRequestMethodKey.String(req.Method),
-				semconv.HTTPRouteKey.String(req.URL.String()),
-			),
+			trace.WithAttributes(attributes...),
 		)
 		defer span.End()
 
-		ctx.Request = ctx.Request.WithContext(rawCtx)
+		sctx := span.SpanContext()
+		rctx = log.WithTraceID(rctx, sctx.TraceID().String())
+		rctx = log.WithSpanID(rctx, sctx.SpanID().String())
+
+		ctx.Request = ctx.Request.WithContext(rctx)
 		ctx.Next()
 
 		span.SetAttributes(

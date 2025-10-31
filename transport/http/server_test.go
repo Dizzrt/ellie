@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 	"testing"
 	"time"
@@ -12,6 +11,7 @@ import (
 	nhttp "net/http"
 
 	"github.com/dizzrt/ellie/internal/mock/ping"
+	"github.com/dizzrt/ellie/log"
 	"github.com/dizzrt/ellie/middleware/tracing"
 	"github.com/dizzrt/ellie/transport/http"
 	"github.com/gin-gonic/gin"
@@ -32,6 +32,8 @@ func (s *pingServer) Ping(ctx context.Context, req *ping.PingRequest) (*ping.Pin
 }
 
 func (s *pingServer) Hello(ctx context.Context, req *ping.HelloRequest) (*ping.HelloResponse, error) {
+	log.CtxInfof(ctx, "get request from %s", req.GetName())
+
 	return &ping.HelloResponse{
 		Message: fmt.Sprintf("hello %s, type is %s", req.GetName(), req.GetType()),
 	}, nil
@@ -107,7 +109,7 @@ func TestHTTPServerWithTracing(t *testing.T) {
 		}),
 	)
 	if err != nil {
-		log.Fatalf("init tracing provider failed: %v", err)
+		t.Fatalf("init tracing provider failed: %v", err)
 	}
 
 	defer func() {
@@ -128,7 +130,9 @@ func TestHTTPServerWithTracing(t *testing.T) {
 			}}
 			return code, r
 		}),
-		http.Middleware(tracing.TracingMiddleware()),
+		http.Middleware(
+			tracing.TracingMiddleware(),
+		),
 	}
 
 	srv := http.NewServer(opts...)
@@ -147,16 +151,21 @@ func TestHTTPServerWithTracing(t *testing.T) {
 	}
 
 	url := e.String() + "/hello/ellie?type=mock"
-	// resp, err := nhttp.Post(url, "application/json", strings.NewReader(``))
-	resp, err := nhttp.Post(url, "application/json", strings.NewReader(`{"name": "ellieFromBody","type": "mockFromBody"}`))
+	reqBody := strings.NewReader(`{"name": "ellieFromBody","type": "mockFromBody"}`)
+	req, err := nhttp.NewRequestWithContext(ctx, "POST", url, reqBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// req.Header.Set("X-Log-ID", "123test111abc")
+	// req.Header.Set("log.id", "123test111")
+
+	client := &nhttp.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer resp.Body.Close()
-
-	// if resp.statusCode != http.StatusOK {
-	// 	t.Fatal(resp.statusCode)
-	// }
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -165,4 +174,6 @@ func TestHTTPServerWithTracing(t *testing.T) {
 
 	fmt.Println(string(body))
 	_ = srv.Stop(ctx)
+
+	log.Sync()
 }

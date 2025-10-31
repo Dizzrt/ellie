@@ -4,13 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"log"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/dizzrt/ellie/internal/mock/ping"
+	"github.com/dizzrt/ellie/log"
 	"github.com/dizzrt/ellie/middleware/tracing"
 	"google.golang.org/grpc"
 )
@@ -20,6 +20,7 @@ type pingServer struct {
 }
 
 func (s *pingServer) Ping(ctx context.Context, req *ping.PingRequest) (*ping.PingResponse, error) {
+	log.CtxInfof(ctx, "ping request: %v", req)
 	return &ping.PingResponse{
 		Message: "pong",
 	}, nil
@@ -185,7 +186,7 @@ func TestPingWithTracing(t *testing.T) {
 		}),
 	)
 	if err != nil {
-		log.Fatalf("init tracing provider failed: %v", err)
+		t.Fatalf("init tracing provider failed: %v", err)
 	}
 
 	defer func() {

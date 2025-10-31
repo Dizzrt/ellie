@@ -21,6 +21,10 @@ const (
 	ginxPackage          = protogen.GoImportPath("github.com/dizzrt/ellie/transport/http/ginx")
 	otelPackage          = protogen.GoImportPath("go.opentelemetry.io/otel")
 	tracePackage         = protogen.GoImportPath("go.opentelemetry.io/otel/trace")
+	logPackage           = protogen.GoImportPath("github.com/dizzrt/ellie/log")
+	attributePackage     = protogen.GoImportPath("go.opentelemetry.io/otel/attribute")
+	propagationPackage   = protogen.GoImportPath("go.opentelemetry.io/otel/propagation")
+	semconvPackage       = protogen.GoImportPath("go.opentelemetry.io/otel/semconv/v1.21.0")
 
 	deprecationComment = "// Deprecated: Do not use."
 )
@@ -62,6 +66,10 @@ func generateContent(gen *protogen.Plugin, f *protogen.File, g *protogen.Generat
 	g.P("var _ = new(", transportHTTPPackage.Ident("Server"), ")")
 	g.P("var _ = ", otelPackage.Ident("Tracer"))
 	g.P("var _ = new(", tracePackage.Ident("Span"), ")")
+	g.P("var _ = new(", logPackage.Ident("Logger"), ")")
+	g.P("var _ = new(", attributePackage.Ident("KeyValue"), ")")
+	g.P("var _ = new(", propagationPackage.Ident("TextMapPropagator"), ")")
+	g.P("var _ =", semconvPackage.Ident("HTTPRequestMethodKey"))
 
 	for _, service := range f.Services {
 		genService(gen, f, g, service, omitempty, omitemptyPrefix)
