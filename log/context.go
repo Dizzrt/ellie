@@ -68,14 +68,16 @@ func WithTraceID(ctx context.Context, traceID string) context.Context {
 
 // extract log_id and traceparent and inject them into context
 func ExtractFromTextMapCarrier(ctx context.Context, carrier propagation.TextMapCarrier) context.Context {
-	if logID := carrier.Get("log.id"); logID != "" {
-		// for grpc metadata
-		ctx = WithLogID(ctx, logID)
-	} else if logID := carrier.Get("X-Log-ID"); logID != "" {
-		// for http header
-		ctx = WithLogID(ctx, logID)
-	} else {
-		ctx = WithLogID(ctx, logid.Generate().String())
+	if logID := LogIDFromContext(ctx); logID == "" {
+		if logID := carrier.Get("log.id"); logID != "" {
+			// for grpc metadata
+			ctx = WithLogID(ctx, logID)
+		} else if logID := carrier.Get("X-Log-ID"); logID != "" {
+			// for http header
+			ctx = WithLogID(ctx, logID)
+		} else {
+			ctx = WithLogID(ctx, logid.Generate().String())
+		}
 	}
 
 	traceparent := carrier.Get("traceparent")
