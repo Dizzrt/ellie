@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -83,7 +84,7 @@ func genService(_ *protogen.Plugin, f *protogen.File, g *protogen.GeneratedFile,
 		g.P(deprecationComment)
 	}
 
-	fileName := strings.TrimSuffix(f.GeneratedFilenamePrefix, ".pb")
+	fileName := strings.TrimSuffix(filepath.Base(f.GeneratedFilenamePrefix), ".pb")
 	tracerName := "TRACER_NAME_" + strings.ToUpper(fileName)
 	desc := &serviceDesc{
 		ServiceType: service.GoName,
