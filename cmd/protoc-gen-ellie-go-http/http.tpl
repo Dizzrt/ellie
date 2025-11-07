@@ -1,7 +1,7 @@
 {{$svrType := .ServiceType}}
 {{$svrName := .ServiceName}}
 
-const TRACER_NAME = "{{$.PackagePath}}"
+const {{.TracerName}} = "{{$.PackagePath}}"
 
 {{- range .MethodSets}}
 const Operation{{$svrType}}{{.OriginalName}} = "/{{$svrName}}/{{.OriginalName}}"
@@ -20,12 +20,12 @@ func Register{{.ServiceType}}HTTPServer(hs *http.Server, srv {{.ServiceType}}HTT
     r := hs.Engine()
 
     {{- range .Methods}}
-    r.{{.Method}}("{{.Path}}", _{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler(hs, srv))
+    r.{{.Method}}("{{.Path}}", _{{$.FileName}}_{{$svrType}}_{{.Method}}_{{.Name}}_HTTP_Handler(hs, srv))
     {{- end}}
 }
 
 {{- range .Methods}}
-func _{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler(hs *http.Server, srv {{$svrType}}HTTPServer) gin.HandlerFunc {
+func _{{$.FileName}}_{{$svrType}}_{{.Method}}_{{.Name}}_HTTP_Handler(hs *http.Server, srv {{$svrType}}HTTPServer) gin.HandlerFunc {
     return func(ctx *gin.Context) {
         var req {{.Request}}
         if err := ginx.DecodeRequest(ctx, &req); err != nil {
@@ -43,7 +43,7 @@ func _{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler(hs *http.Server, srv {{$svrTy
 			attribute.String("log.id", log.LogIDFromContext(rctx)),
 		}
 
-        tracer := otel.Tracer(TRACER_NAME)
+        tracer := otel.Tracer({{$.TracerName}})
 		rctx, span := tracer.Start(rctx, "_{{$svrType}}_{{.Name}}_{{.Num}}_HTTP_Handler",
 			trace.WithSpanKind(trace.SpanKindServer),
 			trace.WithAttributes(attributes...),

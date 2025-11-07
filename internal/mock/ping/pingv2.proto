@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package ping;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/dizzrt/ellie/internal/mock/ping";
+
+message PingV2Request {
+  string message = 1;
+}
+
+message PingV2Response {
+  string message = 1;
+}
+
+service Ping_v2 {
+  rpc Ping(PingV2Request) returns (PingV2Response) {
+    option (google.api.http) = {
+      post: "/v2/ping"
+      body: "*"
+    };
+  }
+}
