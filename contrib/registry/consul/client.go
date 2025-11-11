@@ -156,7 +156,6 @@ func (c *Client) Register(ctx context.Context, svc *registry.ServiceInstance, en
 		checkAddresses = append(checkAddresses, net.JoinHostPort(addr, strconv.FormatUint(port, 10)))
 		addresses[raw.Scheme] = api.ServiceAddress{Address: endpoint, Port: int(port)}
 	}
-	fmt.Println("A1")
 	tags := []string{fmt.Sprintf("version=%s", svc.Version)}
 	if len(c.tags) > 0 {
 		tags = append(tags, c.tags...)
@@ -228,7 +227,6 @@ func (c *Client) Register(ctx context.Context, svc *registry.ServiceInstance, en
 		return err
 	}
 
-	fmt.Println("A2")
 	if c.heartbeat {
 		go func() {
 			defer close(cc.done)
@@ -266,7 +264,6 @@ func (c *Client) Register(ctx context.Context, svc *registry.ServiceInstance, en
 			}
 		}()
 	}
-	fmt.Println("A3")
 	return nil
 }
 
