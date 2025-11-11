@@ -32,9 +32,9 @@ func New(apiClient *api.Client, opts ...Option) *Registry {
 			dc:                             SingleDatacenter,
 			cli:                            apiClient,
 			resolver:                       defaultResolver,
-			healthcheckInterval:            10 * time.Second,
+			healthcheckInterval:            10,
 			heartbeat:                      true,
-			deregisterCriticalServiceAfter: 600 * time.Second,
+			deregisterCriticalServiceAfter: 600,
 			cancelers:                      make(map[string]*canceler),
 		},
 	}
