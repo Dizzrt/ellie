@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dizzrt/ellie/transport/grpc/resolver/discovery"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,8 +20,9 @@ func DialInsecure(opts ...ClientOption) (*grpc.ClientConn, error) {
 
 func dial(isInsecure bool, opts ...ClientOption) (*grpc.ClientConn, error) {
 	options := clientOptions{
-		subsetSize: 25,
-		timeout:    2000 * time.Millisecond,
+		subsetSize:             25,
+		timeout:                2000 * time.Millisecond,
+		printDiscoveryDebugLog: true,
 	}
 
 	for _, opt := range opts {
@@ -42,6 +44,18 @@ func dial(isInsecure bool, opts ...ClientOption) (*grpc.ClientConn, error) {
 	grpcOpts := []grpc.DialOption{
 		grpc.WithChainUnaryInterceptor(ints...),
 		grpc.WithChainStreamInterceptor(sints...),
+	}
+
+	if options.discovery != nil {
+		resolvers := grpc.WithResolvers(discovery.NewBuilder(
+			options.discovery,
+			discovery.WithInsecure(isInsecure),
+			discovery.WithTimeout(options.timeout),
+			discovery.WithSubsetSize(options.subsetSize),
+			discovery.WithDebugLog(options.printDiscoveryDebugLog),
+		))
+
+		grpcOpts = append(grpcOpts, resolvers)
 	}
 
 	if isInsecure {

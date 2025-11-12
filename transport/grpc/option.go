@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/dizzrt/ellie/registry"
 	"google.golang.org/grpc"
 )
 
@@ -92,7 +93,7 @@ type clientOptions struct {
 	subsetSize int
 	tlsConf    *tls.Config
 	timeout    time.Duration
-	// discovery  registry.Discovery
+	discovery  registry.Discovery
 	// middleware
 	// streamMiddleware
 	unaryClientInts  []grpc.UnaryClientInterceptor
@@ -101,7 +102,7 @@ type clientOptions struct {
 	// balancerName
 	// filters
 	// healthCheckConfig
-	// printDiscoveryDebugLog
+	printDiscoveryDebugLog bool
 }
 
 func WithEndpoint(endpoint string) ClientOption {
@@ -128,11 +129,11 @@ func WithTimeout(timeout time.Duration) ClientOption {
 	}
 }
 
-// func WithDiscovery(discovery registry.Discovery) ClientOption {
-// 	return func(o *clientOptions) {
-// 		o.discovery = discovery
-// 	}
-// }
+func WithDiscovery(discovery registry.Discovery) ClientOption {
+	return func(o *clientOptions) {
+		o.discovery = discovery
+	}
+}
 
 func WithUnaryClientInterceptor(ints ...grpc.UnaryClientInterceptor) ClientOption {
 	return func(o *clientOptions) {
@@ -149,6 +150,12 @@ func WithStreamClientInterceptor(ints ...grpc.StreamClientInterceptor) ClientOpt
 func WithOptions(opts ...grpc.DialOption) ClientOption {
 	return func(o *clientOptions) {
 		o.grpcOpts = opts
+	}
+}
+
+func WithPrintDiscoveryDebugLog(print bool) ClientOption {
+	return func(o *clientOptions) {
+		o.printDiscoveryDebugLog = print
 	}
 }
 
