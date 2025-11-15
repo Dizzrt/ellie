@@ -113,7 +113,8 @@ func (r *Registry) Watch(ctx context.Context, serviceName string) (registry.Watc
 	r.lock.Unlock()
 
 	w := &watcher{
-		event: make(chan struct{}, 1),
+		event:       make(chan struct{}, 1),
+		initialized: false,
 	}
 
 	w.ctx, w.cancel = context.WithCancel(ctx)

@@ -2,7 +2,6 @@ package consul
 
 import (
 	"context"
-	"time"
 
 	"github.com/dizzrt/ellie/registry"
 )
@@ -15,6 +14,8 @@ type watcher struct {
 
 	ctx    context.Context
 	cancel context.CancelFunc
+
+	initialized bool
 }
 
 func (w *watcher) Next() ([]*registry.ServiceInstance, error) {
@@ -22,23 +23,19 @@ func (w *watcher) Next() ([]*registry.ServiceInstance, error) {
 		return nil, err
 	}
 
-	// svcs := make([]*registry.ServiceInstance, 0)
-	// temp, ok := w.set.services.Load().([]*registry.ServiceInstance)
-	// if ok {
-	// 	svcs = append(svcs, temp...)
-	// }
+	if !w.initialized {
+		svcs := make([]*registry.ServiceInstance, 0)
+		if temp, ok := w.set.services.Load().([]*registry.ServiceInstance); ok {
+			svcs = append(svcs, temp...)
+		}
 
-	// if len(svcs) > 0 {
-	// 	return svcs, nil
-	// }
-
-	// avoid block on no event
-	timeoutCtx, cancel := context.WithTimeout(w.ctx, 5*time.Second)
-	defer cancel()
+		w.initialized = true
+		return svcs, nil
+	}
 
 	select {
-	case <-timeoutCtx.Done():
-		return []*registry.ServiceInstance{}, nil
+	case <-w.ctx.Done():
+		return nil, w.ctx.Err()
 	case <-w.event:
 	}
 

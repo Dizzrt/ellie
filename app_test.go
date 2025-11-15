@@ -27,7 +27,9 @@ func TestApp(t *testing.T) {
 	ping.RegisterPingServiceServer(gsrv, &pingServer{})
 	ping.RegisterPingServiceHTTPServer(hsrv, &pingServer{})
 
-	client, err := api.NewClient(api.DefaultConfig())
+	client, err := api.NewClient(&api.Config{
+		Address: "dev.ellie.com:8500",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

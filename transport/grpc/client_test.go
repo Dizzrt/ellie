@@ -14,7 +14,7 @@ import (
 func TestDiscovery(t *testing.T) {
 	var err error
 	var client *api.Client
-	if client, err = api.NewClient(api.DefaultConfig()); err != nil {
+	if client, err = api.NewClient(&api.Config{Address: "dev.ellie.com:8500"}); err != nil {
 		t.Fatal(err)
 	}
 
