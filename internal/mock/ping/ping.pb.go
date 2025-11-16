@@ -60,7 +60,7 @@ func (*PingRequest) Descriptor() ([]byte, []int) {
 
 type PingResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty" k1:"v1"` // test tags tags:`k1:"v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty" k1:"v1" kk:"v1,v2"` // test tags tags:`k1:"v1" kk:"v1,v2"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

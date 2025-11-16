@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-const release = "v1.0.1"
+const release = "v1.36.10-ellie.1"
 const baseProtobufRelease = "v1.36.10"
 
 var showVersion = flag.Bool("version", false, "print the version and exit")
