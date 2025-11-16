@@ -27,7 +27,7 @@ service PingService {
 message PingRequest {}
 
 message PingResponse {
-    string message = 1;
+    string message = 1; // test tags tags:`k1:"v1"`
 }
 
 message HelloRequest {
